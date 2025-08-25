@@ -1,8 +1,5 @@
-# 💡 SpiderNet Ideas (Advisory)
-
-- Auto-suggest system improvements daily
-- Record every new feature request here
-- Connect Archivist agent with Advisory tab in Cockpit
-
----
-(SpiderNet will expand this file automatically as it learns.)
+# 💡 IDEAS.md (Advisory)
+- Add Archivist Agent (auto-logs all actions)
+- Advisory Tab in Cockpit with daily suggestions
+- Expand Cleaner to auto-detect file types
+- Cloud backup integration (encrypted)
