@@ -1,32 +1,19 @@
 #!/bin/bash
-# 🌻 SpiderNet Installer v2
-set -euo pipefail
+# 🌻 Install script for Linux - creates desktop shortcut
+BASE="$HOME/SpiderNet"
+mkdir -p "$BASE"
+DESKTOP="$HOME/Desktop"
+ICON="$BASE/assets/sunflower.png"
+APP="$BASE/cockpit.py"
 
-TARGET_USER="${SUDO_USER:-$USER}"
-HOME_DIR="$(getent passwd "$TARGET_USER" | cut -d: -f6)"
-BASE="$HOME_DIR/.spidernet"
-TOOLS="$BASE/tools"
-ASSETS="$BASE/assets"
-
-echo "=== 🌻 Installing SpiderNet Cockpit v2 for $TARGET_USER ==="
-
-mkdir -p "$TOOLS" "$ASSETS"
-
-grep -qxF 'alias spn="python3 $BASE/cockpit.py"' "$HOME_DIR/.bashrc" || echo 'alias spn="python3 $BASE/cockpit.py"' >> "$HOME_DIR/.bashrc"
-
-DESKTOP_FILE="$HOME_DIR/Desktop/SpiderNet.desktop"
-ICON_FILE="$ASSETS/sunflower.png"
-
-cat > "$DESKTOP_FILE" <<EOF
+cat > "$DESKTOP/SpiderNet-Cockpit.desktop" <<EOL
 [Desktop Entry]
+Name=SpiderNet Cockpit
+Exec=python3 $APP
+Icon=$ICON
 Type=Application
-Name=SpiderNet 🌻
-Exec=python3 $BASE/cockpit.py
-Icon=$ICON_FILE
 Terminal=false
-EOF
+EOL
 
-chmod +x "$DESKTOP_FILE"
-cp "$(dirname "$0")/assets/sunflower.png" "$ICON_FILE"
-
-echo "✅ Installation complete! Launch with: spn"
+chmod +x "$DESKTOP/SpiderNet-Cockpit.desktop"
+echo "🌻 Cockpit shortcut created on Desktop."
