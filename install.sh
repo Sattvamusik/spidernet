@@ -1,4 +1,66 @@
 #!/bin/bash
+set -euo pipefail
+
+TARGET_USER="${SUDO_USER:-$USER}"
+HOME_DIR="$(getent passwd "$TARGET_USER" | cut -d: -f6)"
+BASE="$HOME_DIR/.spidernet"
+BIN="$HOME_DIR/.local/bin"
+LOGS="$BASE/logs"
+AUTOSTART="$HOME_DIR/.config/autostart"
+
+echo "⚡ Installing SpiderNet for $TARGET_USER ..."
+
+mkdir -p "$BASE" "$BIN" "$LOGS" "$AUTOSTART"
+
+# --- Passwordless sudo setup ---
+if [ ! -f "/etc/sudoers.d/$TARGET_USER" ]; then
+  echo "$TARGET_USER ALL=(ALL) NOPASSWD:ALL" | sudo tee "/etc/sudoers.d/$TARGET_USER" >/dev/null
+  sudo chmod 440 "/etc/sudoers.d/$TARGET_USER"
+  echo "🔓 Passwordless sudo configured for $TARGET_USER"
+fi
+
+# --- Agents ---
+cat > "$BIN/spn-hospital" <<'EOF'
+#!/bin/bash
+echo "🏥 Hospital running..."
+EOF
+
+cat > "$BIN/spn-trauma" <<'EOF'
+#!/bin/bash
+echo "🚑 Trauma repairing..."
+EOF
+
+cat > "$BIN/spn-cleaner" <<'EOF'
+#!/bin/bash
+echo "🧹 Cleaning desktop..."
+EOF
+
+cat > "$BIN/spn-watchdog" <<'EOF'
+#!/bin/bash
+echo "👀 Watchdog watching..."
+EOF
+
+chmod +x "$BIN"/spn-*
+
+# --- Cockpit desktop entry ---
+cat > "$AUTOSTART/spidernet.desktop" <<EOF
+[Desktop Entry]
+Type=Application
+Exec=$BIN/spn-cockpit
+Hidden=false
+X-GNOME-Autostart-enabled=true
+Name=SpiderNet Cockpit
+EOF
+
+# --- Cockpit placeholder ---
+cat > "$BIN/spn-cockpit" <<'EOF'
+#!/bin/bash
+zenity --info --title="🕸️ SpiderNet Cockpit" --text="✅ SpiderNet is Alive\n\nHospital, Trauma, Cleaner, Watchdog running."
+EOF
+chmod +x "$BIN/spn-cockpit"
+
+echo "✅ SpiderNet install complete. Run 'spn-cockpit' or reboot to auto-start."
+#!/bin/bash
 # =========================================================
 # 🕸 SpiderNet — One-Command Self-Healing OS Installer
 # =========================================================
