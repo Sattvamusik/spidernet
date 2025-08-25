@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # 🌻 SpiderNet Cockpit v2 — Dynamic Dashboard with ManualReader check
 
-import os, sys, subprocess, tkinter as tk
+import os, subprocess, tkinter as tk
 
 # === Run ManualReader first ===
 def run_manualreader():
@@ -13,9 +13,9 @@ def run_manualreader():
         subprocess.call(["bash", sh_path])
     elif os.path.exists(ps_path):
         # prefer pwsh if available
-        if subprocess.call(["which", "pwsh"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL) == 0:
+        try:
             subprocess.call(["pwsh", "-File", ps_path])
-        else:
+        except FileNotFoundError:
             subprocess.call(["powershell", "-File", ps_path])
     else:
         print("⚠️ ManualReader not found — proceeding anyway (NOT RECOMMENDED)")
@@ -23,26 +23,9 @@ def run_manualreader():
 # Run before GUI starts
 run_manualreader()
 
-# === GUI Code (unchanged) ===
+# === GUI Code ===
 BG_COLOR = "#fffbea"
 BTN_COLOR = "#ffe066"
-TEXT_COLOR = "#333333"
-
-root = tk.Tk()
-root.title("🌻 SpiderNet Cockpit v2")
-root.configure(bg=BG_COLOR)
-root.geometry("800x600")
-
-# ... rest of Cockpit code as before ...
-#!/usr/bin/env python3
-# 🌻 SpiderNet Cockpit v2 — Dynamic Dashboard
-
-import os
-import tkinter as tk
-
-# 🌻 Theme Colors
-BG_COLOR = "#fffbea"         
-BTN_COLOR = "#ffe066"        
 TEXT_COLOR = "#333333"
 
 root = tk.Tk()
