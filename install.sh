@@ -1,6 +1,43 @@
 #!/bin/bash
 set -euo pipefail
 
+USER="${SUDO_USER:-$USER}"
+HOME_DIR="/home/$USER"
+BASE="$HOME_DIR/.spidernet"
+SPN_BIN="$HOME_DIR/.local/bin"
+BASHRC="$HOME_DIR/.bashrc"
+LOGS="$BASE/logs"
+SYSTEMD="$HOME_DIR/.config/systemd/user"
+
+echo "⚡ Installing SpiderNet for $USER ..."
+
+# --- Safe sudo wrapper ---
+run_sudo() {
+  if sudo -n true 2>/dev/null; then
+    sudo "$@"
+  else
+    echo "⚠️  Passwordless sudo not active. Trying with password..."
+    sudo "$@"
+  fi
+}
+
+# --- Configure passwordless sudo if missing ---
+if ! sudo -n true 2>/dev/null; then
+  echo "🔑 Configuring passwordless sudo for $USER ..."
+  echo "$USER ALL=(ALL) NOPASSWD:ALL" | sudo tee "/etc/sudoers.d/$USER" >/dev/null || true
+  sudo chmod 440 "/etc/sudoers.d/$USER" || true
+fi
+
+# --- Create dirs ---
+mkdir -p "$BASE" "$LOGS" "$SPN_BIN" "$SYSTEMD"
+
+# --- Install deps ---
+echo "📦 Installing dependencies..."
+run_sudo apt-get update -qq
+run_sudo apt-get install -y python3-pyqt5 zenity libnotify-bin xdg-utils
+#!/bin/bash
+set -euo pipefail
+
 TARGET_USER="${SUDO_USER:-$USER}"
 HOME_DIR="$(getent passwd "$TARGET_USER" | cut -d: -f6)"
 BASE="$HOME_DIR/.spidernet"
