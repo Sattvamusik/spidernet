@@ -1,3 +1,8 @@
+# --- Cleanup any bad old aliases ---
+if grep -q "alias spn clean" "$HOME/.bashrc"; then
+  sed -i '/alias spn clean/d' "$HOME/.bashrc"
+  echo "🧹 Removed broken alias 'spn clean'"
+fi
 #!/bin/bash
 # 🕸 SpiderNet v5 — Secure Self-Healing System
 set -euo pipefail
