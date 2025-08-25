@@ -1,3 +1,49 @@
+name: 🌻 SpiderNet GiftWrap Auto-Sync
+
+on:
+  release:
+    types: [published]      # Trigger when a Release is published
+  push:
+    paths:
+      - "spidernet_secure_*.zip"   # Trigger when ZIP uploaded in repo root
+
+jobs:
+  giftwrap:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      # 🔹 Case 1: Release ZIP
+      - name: Download release asset
+        if: github.event_name == 'release'
+        uses: dsaltares/fetch-gh-release-asset@master
+        with:
+          repo: ${{ github.repository }}
+          version: latest
+          file: spidernet_secure_v2.zip
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # 🔹 Case 2: Root ZIP (already pushed by user)
+      - name: Extract root ZIPs
+        if: github.event_name == 'push'
+        run: |
+          for z in spidernet_secure_*.zip; do
+            if [ -f "$z" ]; then
+              echo "📦 Extracting $z ..."
+              unzip -o "$z" -d .
+              rm "$z"
+            fi
+          done
+
+      # 🔹 Common Commit & Push
+      - name: Commit & Push
+        run: |
+          git config user.name "spidernet-bot"
+          git config user.email "bot@sattvamusk.com"
+          git add .
+          git commit -m "🌻 GiftWrap Auto-Sync from ZIP" || echo "No changes to commit"
+          git push origin main
 name: 🌻 Root ZIP Auto-Sync
 
 on:
