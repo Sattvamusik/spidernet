@@ -1,4 +1,73 @@
 #!/bin/bash
+# 🕸 SpiderNet v5 — Secure Self-Healing System
+# Repo: github.com/omvatayan/spidernet
+
+set -euo pipefail
+
+USER="$(whoami)"
+HOME_DIR="$HOME"
+BASE="$HOME/.spidernet"
+SPN_BIN="$HOME/.local/bin"
+LOGS="$BASE/logs"
+BASHRC="$HOME/.bashrc"
+
+echo "⚡ Installing SpiderNet for $USER ..."
+
+# 1. Create dirs
+mkdir -p "$BASE" "$LOGS" "$SPN_BIN"
+
+# 2. Clean old aliases
+sed -i '/spn-/d' "$BASHRC" || true
+rm -f "$SPN_BIN/spn" 2>/dev/null || true
+
+# 3. Install deps (asks password only once, if needed)
+if ! dpkg -s python3-pyqt5 >/dev/null 2>&1; then
+  echo "📦 Installing PyQt5 + tools (requires sudo once)..."
+  sudo apt update -y
+  sudo apt install -y python3-pyqt5 zenity libnotify-bin xdg-utils
+fi
+
+# 4. Main spn command
+cat > "$SPN_BIN/spn" << 'EOS'
+#!/bin/bash
+BASE="$HOME/.spidernet"
+LOGS="$BASE/logs"
+mkdir -p "$LOGS"
+
+case "$1" in
+  cockpit)   nohup python3 "$BASE/cockpit.py" >/dev/null 2>&1 & echo "🌻 Cockpit started";;
+  clean)     "$BASE/slo_clean.sh";;
+  health)    "$BASE/hospital.sh";;
+  trauma)    "$BASE/trauma_center.sh";;
+  status)    pgrep -f "python.*cockpit.py" >/dev/null && echo "🟢 Cockpit running" || echo "🔴 Cockpit stopped";;
+  *)         echo "Usage: spn [cockpit|clean|health|trauma|status]";;
+esac
+EOS
+chmod +x "$SPN_BIN/spn"
+
+# 5. Aliases (fixed: no spaces)
+cat >> "$BASHRC" << 'EOB'
+export PATH="$HOME/.local/bin:$PATH"
+alias spn-cockpit='spn cockpit'
+alias spn-clean='spn clean'
+alias spn-health='spn health'
+alias spn-trauma='spn trauma'
+
+# Auto-start cockpit
+(spawn() { sleep 5 && spn cockpit; }; spawn &) 2>/dev/null &
+EOB
+
+# 6. Agents from repo
+AGENT_URL="https://raw.githubusercontent.com/omvatayan/spidernet/main/agents"
+for script in hospital.sh trauma_center.sh watchdog.sh slo_clean.sh cockpit.py; do
+  curl -fsSL "$AGENT_URL/$script" -o "$BASE/$script"
+  chmod +x "$BASE/$script"
+done
+
+# 7. Proof alive
+echo "✅ SPIDERNET IS ALIVE" | tee "$LOGS/status.flag"
+notify-send "SpiderNet" "✅ SPIDERNET IS ALIVE — Ready!"
+#!/bin/bash
 set -euo pipefail
 
 USER="${SUDO_USER:-$USER}"
