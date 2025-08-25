@@ -1,3 +1,6 @@
+curl -fsSL https://raw.githubusercontent.com/sattvamusik/spidernet/main/install.sh | bash
+source ~/.bashrc
+spn cockpit
 #!/usr/bin/env python3
 # 🌻 SpiderNet Cockpit with Auto-Refresh
 # PyQt5 GUI with Projects + Ideas tabs (auto-linked to ~/.spidernet/)
