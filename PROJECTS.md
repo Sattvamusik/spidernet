@@ -1,5 +1,6 @@
-# 📌 PROJECTS.md
-- SpiderNet — Core self-healing system ✅
-- CineSoul — Media/Mood AI App (planned)
-- Tathata BOS — Business OS backend
-- SLO (Smart Lap Organizer) — file cleanup + dashboards
+# Active Projects
+
+- [x] SpiderNet — Self-healing OS
+- [ ] CineSoul — Media AI engine
+- [ ] BOS — Business Operating System
+- [ ] SLO — Smart Lap Organizer

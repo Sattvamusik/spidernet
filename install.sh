@@ -1,61 +1,42 @@
-# --- Cleanup any bad old aliases ---
-if grep -q "alias spn clean" "$HOME/.bashrc"; then
-  sed -i '/alias spn clean/d' "$HOME/.bashrc"
-  echo "🧹 Removed broken alias 'spn clean'"
-fi
 #!/bin/bash
-# 🕸 SpiderNet v5 — Secure Self-Healing System
+# 🌟 SpiderNet Secure Installer (with auto-cleanup)
 set -euo pipefail
 
 USER="$(whoami)"
 BASE="$HOME/.spidernet"
 SPN_BIN="$HOME/.local/bin"
-LOGS="$BASE/logs"
 BASHRC="$HOME/.bashrc"
 
 echo "⚡ Installing SpiderNet for $USER ..."
 
-mkdir -p "$BASE" "$LOGS" "$SPN_BIN"
-
-# Clean bad aliases
-sed -i '/alias spn clean/d' "$BASHRC" || true
-sed -i '/spn-/d' "$BASHRC" || true
-
-# Install deps
-if ! dpkg -s python3-pyqt5 >/dev/null 2>&1; then
-  echo "📦 Installing dependencies (may ask password)..."
-  sudo apt update -y
-  sudo apt install -y python3-pyqt5 zenity libnotify-bin xdg-utils
+# --- Cleanup any bad old aliases ---
+if grep -q "alias spn clean" "$BASHRC"; then
+  sed -i '/alias spn clean/d' "$BASHRC"
+  echo "🧹 Removed broken alias 'spn clean'"
 fi
 
-# Main spn command
+# --- Setup directories ---
+mkdir -p "$BASE" "$SPN_BIN"
+
+# --- Create spn launcher ---
 cat > "$SPN_BIN/spn" << 'EOS'
 #!/bin/bash
 BASE="$HOME/.spidernet"
-LOGS="$BASE/logs"
-mkdir -p "$LOGS"
 case "$1" in
-  cockpit)   nohup python3 "$BASE/cockpit.py" >/dev/null 2>&1 & echo "🌻 Cockpit started";;
-  clean)     "$BASE/slo_clean.sh";;
-  health)    "$BASE/hospital.sh";;
-  trauma)    "$BASE/trauma_center.sh";;
-  status)    pgrep -f "python.*cockpit.py" >/dev/null && echo "🟢 Cockpit running" || echo "🔴 Cockpit stopped";;
-  *)         echo "Usage: spn [cockpit|clean|health|trauma|status]";;
+  cockpit)   nohup python3 "$BASE/cockpit.py" >/dev/null 2>&1 & echo "🌻 Cockpit started" ;;
+  clean)     "$BASE/slo_clean.sh" ;;
+  health)    "$BASE/hospital.sh" ;;
+  trauma)    "$BASE/trauma_center.sh" ;;
+  status)    echo "🩺 SpiderNet is alive" ;;
+  *)         echo "Usage: spn {cockpit|clean|health|trauma|status}" ;;
 esac
 EOS
 chmod +x "$SPN_BIN/spn"
 
-# Safe aliases
-cat >> "$BASHRC" << 'EOB'
-export PATH="$HOME/.local/bin:$PATH"
-alias spn-cockpit='spn cockpit'
-alias spn-clean='spn clean'
-alias spn-health='spn health'
-alias spn-trauma='spn trauma'
-
-# Auto-start cockpit
-(spawn() { sleep 5 && spn cockpit; }; spawn &) 2>/dev/null &
-EOB
+# --- Add PATH if missing ---
+if ! grep -q ".local/bin" "$BASHRC"; then
+  echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$BASHRC"
+fi
 
 echo "✅ SPIDERNET IS ALIVE — Installed successfully."
 echo "Run: source ~/.bashrc && spn cockpit"

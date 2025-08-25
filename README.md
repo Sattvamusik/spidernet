@@ -1,4 +1,4 @@
-# 🕸 SpiderNet Secure v5
+# SpiderNet Secure v5
 Self-healing desktop nervous system.
 
 ## Install
@@ -7,3 +7,11 @@ curl -fsSL https://raw.githubusercontent.com/omvatayan/spidernet/main/install.sh
 source ~/.bashrc
 spn cockpit
 ```
+
+## Features
+- 🏥 Hospital (Diagnostics)
+- 🚑 Trauma (Repairs)
+- 👁️ Watchdog (Every 5 min)
+- 🧹 Cleaner (Organize Desktop)
+- 🌻 Cockpit GUI (Dashboard)
+- ✅ Auto-proves it is alive at install
