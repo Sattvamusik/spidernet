@@ -1,3 +1,41 @@
+name: 🌻 SpiderNet GiftWrap Auto-Sync (with ManualReader Check)
+
+on:
+  release:
+    types: [published]
+  push:
+    paths:
+      - "spidernet_secure_*.zip"
+
+jobs:
+  giftwrap:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      # 🔎 Inspect ZIP first
+      - name: Verify ManualReader presence
+        run: |
+          for z in spidernet_secure_*.zip; do
+            if [ -f "$z" ]; then
+              unzip -l "$z" | tee manifest.txt
+              if ! grep -q "ManualReader.ps1" manifest.txt || ! grep -q "ManualReader.sh" manifest.txt; then
+                echo "❌ ERROR: ManualReader missing in $z. GiftWrap aborted."
+                exit 1
+              fi
+            fi
+          done
+
+      # 📥 Release ZIP download (if triggered by release)
+      - name: Download release asset
+        if: github.event_name == 'release'
+        uses: dsaltares/fetch-gh-release-asset@master
+        with:
+          repo: ${{ github.repository }}
+          version: latest
+          file: spidernet_secure_v2.zip
+          token: ${
 name: 🌻 SpiderNet GiftWrap Auto-Sync
 
 on:
