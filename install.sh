@@ -1,4 +1,77 @@
 #!/bin/bash
+# 🌐 SpiderNet Secure Installer
+# Always fetches the latest Cockpit + Agents + Docs from GitHub
+
+set -euo pipefail
+
+USER="$(whoami)"
+HOME_DIR="/home/$USER"
+BASE="$HOME_DIR/.spidernet"
+SPN_BIN="$HOME_DIR/.local/bin"
+BASHRC="$HOME_DIR/.bashrc"
+LOGS="$BASE/logs"
+
+REPO_RAW="https://raw.githubusercontent.com/sattvamusik/spidernet/main"
+
+echo "⚡ Installing SpiderNet for $USER ..."
+
+# --- 1. Create directories ---
+mkdir -p "$BASE" "$LOGS" "$SPN_BIN"
+
+# --- 2. Clean broken aliases (fixes 'alias spn clean' error) ---
+sed -i '/alias spn clean/d' "$BASHRC" || true
+sed -i '/spn-/d' "$BASHRC" || true
+
+# --- 3. Create spn command ---
+cat > "$SPN_BIN/spn" << 'EOS'
+#!/bin/bash
+BASE="$HOME/.spidernet"
+case "$1" in
+  cockpit)   nohup python3 "$BASE/cockpit.py" >/dev/null 2>&1 & echo "🌻 Cockpit started" ;;
+  clean)     "$BASE/slo_clean.sh" ;;
+  health)    "$BASE/hospital.sh" ;;
+  trauma)    "$BASE/trauma_center.sh" ;;
+  status)    echo "🕸️ SpiderNet status:"; pgrep -f cockpit.py >/dev/null && echo "✅ Cockpit running" || echo "❌ Cockpit stopped" ;;
+  *)         echo "Usage: spn {cockpit|clean|health|trauma|status}" ;;
+esac
+EOS
+chmod +x "$SPN_BIN/spn"
+
+# --- 4. Add PATH + safe aliases ---
+if ! grep -q "spidernet" "$BASHRC"; then
+  cat >> "$BASHRC" << 'EOB'
+export PATH="$HOME/.local/bin:$PATH"
+alias spn-cockpit='spn cockpit'
+alias spn-clean='spn clean'
+alias spn-health='spn health'
+alias spn-trauma='spn trauma'
+EOB
+fi
+
+# --- 5. Download latest files from GitHub ---
+for file in cockpit.py PROJECTS.md IDEAS.md reset.sh update.sh; do
+  echo "📥 Fetching $file ..."
+  curl -fsSL "$REPO_RAW/$file" -o "$BASE/$file"
+done
+
+# --- 6. Install Python deps if missing ---
+if ! python3 -c "import PyQt5" >/dev/null 2>&1; then
+  echo "📦 Installing PyQt5 (requires sudo, enter password if asked)..."
+  sudo apt update -y
+  sudo apt install -y python3-pyqt5
+fi
+
+# --- 7. Auto-start Cockpit on login ---
+if ! grep -q "spn cockpit" "$BASHRC"; then
+  cat >> "$BASHRC" << 'EOL'
+# Auto-launch SpiderNet Cockpit
+(spawn() { sleep 5 && spn cockpit; }; spawn &) 2>/dev/null &
+EOL
+fi
+
+echo "✅ SPIDERNET IS ALIVE — Installed successfully."
+echo "👉 Run: source ~/.bashrc && spn cockpit"
+#!/bin/bash
 # 🌟 SpiderNet Secure Installer (v5)
 
 set -euo pipefail
