@@ -1,10 +1,6 @@
-# 📂 SpiderNet Projects
-
-- ✅ SpiderNet (Core self-healing OS)
-- ✅ CineSoul (Media-mood AI)
-- ✅ BOS (Business Operating System)
-- ✅ SLO (Smart Lap Organizer)
 # 🌻 SpiderNet Projects
+- SLO (Smart Lap Organizer)
+- BOS (Business Operating System)
 - Retreats Website
 - T-shirts (Tees Universe)
-
+- ZenCabs
