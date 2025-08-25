@@ -1,1 +1,3 @@
-echo '🔄 Updating SpiderNet from GitHub...'
+#!/bin/bash
+echo '🔄 Updating SpiderNet...'
+cd ~/.spidernet && git pull || true

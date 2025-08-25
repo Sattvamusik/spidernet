@@ -1,5 +1,7 @@
-# Advisory / Future Ideas
+# 💡 SpiderNet Advisory / Ideas
 
-- Add Archivist agent (auto-logs everything)
-- Advisory tab in Cockpit (auto-suggestions)
-- Self-learning: suggest improvements daily
+- Auto-learning: Capture improvements daily
+- Add GPG-signed script verification
+- Add phone alerts via Telegram bot
+- Add encrypted auto-backups
+- Add Web Cockpit mode

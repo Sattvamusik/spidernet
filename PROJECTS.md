@@ -1,6 +1,6 @@
-# Active Projects
+# 📂 SpiderNet Projects
 
-- [x] SpiderNet — Self-healing OS
-- [ ] CineSoul — Media AI engine
-- [ ] BOS — Business Operating System
-- [ ] SLO — Smart Lap Organizer
+- ✅ SpiderNet (Core self-healing OS)
+- ✅ CineSoul (Media-mood AI)
+- ✅ BOS (Business Operating System)
+- ✅ SLO (Smart Lap Organizer)

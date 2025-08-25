@@ -1,4 +1,5 @@
-# SpiderNet Secure v5
+# 🕸️ SpiderNet Secure v5
+
 Self-healing desktop nervous system.
 
 ## Install
@@ -15,3 +16,11 @@ spn cockpit
 - 🧹 Cleaner (Organize Desktop)
 - 🌻 Cockpit GUI (Dashboard)
 - ✅ Auto-proves it is alive at install
+
+## Files
+- `install.sh` → installer
+- `reset.sh` → reset system state
+- `update.sh` → manual update
+- `cockpit.py` → GUI dashboard
+- `PROJECTS.md` → tracks projects
+- `IDEAS.md` → advisory / suggestions
