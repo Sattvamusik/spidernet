@@ -1,11 +1,7 @@
 <#
- 🌻 SpiderNet Agent: ManualReader.ps1
- Purpose: Ensure every agent reads the SpiderNet™ Karma Manual before running.
+ 🌻 SpiderNet Agent: ManualReader.ps1 (Ordered Reading)
+ Purpose: Always read Original v1.0 first, then all Addenda (v2.0, v3.0...).
 
- - Checks for KarmaManual/ folder
- - Reads all .md files (unaltered)
- - Logs success or failure to manualreader.log
- - Works on PowerShell 5+ and 7+
 #>
 
 Set-StrictMode -Version Latest
@@ -17,33 +13,40 @@ $ManualPath = Join-Path $BasePath "KarmaManual"
 $LogDir     = Join-Path $BasePath "Agents\ManualReader\logs"
 $LogFile    = Join-Path $LogDir "manualreader.log"
 
-# Ensure log dir exists
 if (-not (Test-Path $LogDir)) {
     New-Item -ItemType Directory -Force -Path $LogDir | Out-Null
 }
 
-# === Verify Karma Manual exists ===
 if (-not (Test-Path $ManualPath)) {
     "[$(Get-Date)] ❌ ERROR: KarmaManual folder not found at $ManualPath" | Out-File -Append $LogFile
     Write-Error "KarmaManual is missing. Agents cannot start."
     exit 1
 }
 
-# === Read all manual sections ===
-$ManualFiles = Get-ChildItem -Path $ManualPath -Filter *.md -ErrorAction Stop
+# === Ordered reading ===
+$Original = Get-ChildItem -Path $ManualPath -Filter *_v1.0_Original.md -ErrorAction SilentlyContinue
+$Others   = Get-ChildItem -Path $ManualPath -Filter *.md -ErrorAction SilentlyContinue | Where-Object { $_.Name -notlike "*_v1.0_Original.md" } | Sort-Object Name
 
-if ($ManualFiles.Count -eq 0) {
+if (-not $Original -and $Others.Count -eq 0) {
     "[$(Get-Date)] ❌ ERROR: No manual sections found in $ManualPath" | Out-File -Append $LogFile
     Write-Error "No Karma Manual sections present."
     exit 1
 }
 
-foreach ($file in $ManualFiles) {
-    "[$(Get-Date)] 📖 Reading manual: $($file.Name)" | Out-File -Append $LogFile
+# Read Original first
+foreach ($file in $Original) {
+    "[$(Get-Date)] 📖 Reading ORIGINAL manual: $($file.Name)" | Out-File -Append $LogFile
     Get-Content $file.FullName | Out-File -Append $LogFile
     "[$(Get-Date)] ✅ Finished reading $($file.Name)" | Out-File -Append $LogFile
 }
 
-"[$(Get-Date)] 🌻 ManualReader complete. All agents are now aligned with Karma Manual." | Out-File -Append $LogFile
+# Read all others
+foreach ($file in $Others) {
+    "[$(Get-Date)] 📖 Reading addendum manual: $($file.Name)" | Out-File -Append $LogFile
+    Get-Content $file.FullName | Out-File -Append $LogFile
+    "[$(Get-Date)] ✅ Finished reading $($file.Name)" | Out-File -Append $LogFile
+}
+
+"[$(Get-Date)] 🌻 ManualReader complete. All agents aligned with Karma Manual." | Out-File -Append $LogFile
 Write-Host "🌻 ManualReader finished. Agents are synced with Karma Manual."
 exit 0
