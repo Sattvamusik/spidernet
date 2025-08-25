@@ -1,3 +1,16 @@
+name: 🌻 Root ZIP Auto-Sync
+
+on:
+  push:
+    paths:
+      - "spidernet_secure_*.zip"   # any ZIP dropped in repo root
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
 name: 🌻 Release Auto-Sync
 
 on:
