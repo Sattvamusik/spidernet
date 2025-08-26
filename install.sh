@@ -1,3 +1,10 @@
+ZIP_URL=$(curl -s https://api.github.com/repos/Sattvamusik/spidernet/releases/latest \
+  | grep "browser_download_url" \
+  | grep "spidernet_secure.zip" \
+  | cut -d '"' -f 4)
+
+curl -L "$ZIP_URL" -o /tmp/spidernet_secure.zip
+unzip -o /tmp/spidernet_secure.zip -d "$BASE"
 #!/bin/bash
 # 🌻 SpiderNet Installer (Linux/macOS)
 # Usage: curl -fsSL https://github.com/Sattvamusik/spidernet/releases/latest/download/install.sh | bash
