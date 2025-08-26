@@ -1,4 +1,44 @@
 #!/bin/bash
+# 🌻 SpiderNet v4.0 Installer (Linux/WSL/macOS)
+
+set -e
+
+echo "🌻 Installing SpiderNet v4.0 Sunflower Cockpit..."
+
+BASE="$HOME/.spidernet"
+INSTALL_DIR="$HOME/SpiderNet"
+BIN="$HOME/.local/bin"
+ZIP_URL="https://github.com/Sattvamusik/spidernet/releases/latest/download/spidernet_secure.zip"
+
+# Ensure paths
+mkdir -p "$BASE" "$BIN"
+mkdir -p "$INSTALL_DIR"
+
+# Fetch latest ZIP
+echo "📦 Downloading release package..."
+curl -L "$ZIP_URL" -o /tmp/spidernet_secure.zip
+
+# Extract
+unzip -o /tmp/spidernet_secure.zip -d "$INSTALL_DIR"
+
+# Ensure cockpit seed files
+[ -f "$INSTALL_DIR/PROJECTS.md" ] || echo "# Projects" > "$INSTALL_DIR/PROJECTS.md"
+[ -f "$INSTALL_DIR/IDEAS.md" ] || echo "# Ideas" > "$INSTALL_DIR/IDEAS.md"
+
+# Add 'spn' command shortcut
+cat > "$BIN/spn" <<EOF
+#!/bin/bash
+python3 "$INSTALL_DIR/cockpit.py" "\$@"
+EOF
+chmod +x "$BIN/spn"
+
+# Add to PATH if missing
+if ! grep -q "$BIN" <<< "\$PATH"; then
+  echo "export PATH=\$PATH:$BIN" >> "$HOME/.bashrc"
+fi
+
+echo "✅ Installed. Run with: spn cockpit"
+#!/bin/bash
 set -e
 INSTALL_DIR="$HOME/SpiderNet"
 ZIP="$INSTALL_DIR/spidernet_secure.zip"
