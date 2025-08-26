@@ -1,6 +1,41 @@
 name: Build & Release SpiderNet
 
 on:
+  release:
+    types: [created]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Prepare build tree
+        run: |
+          mkdir -p spidernet_secure_v${{ github.ref_name }}
+          cp -r agents spidernet_secure_v${{ github.ref_name }}/
+          cp -r assets spidernet_secure_v${{ github.ref_name }}/
+          cp cockpit.py spidernet_secure_v${{ github.ref_name }}/
+          cp install.sh spidernet_secure_v${{ github.ref_name }}/
+          cp install.ps1 spidernet_secure_v${{ github.ref_name }}/
+          echo "# Projects" > spidernet_secure_v${{ github.ref_name }}/PROJECTS.md
+          echo "# Ideas" > spidernet_secure_v${{ github.ref_name }}/IDEAS.md
+
+      - name: Zip package
+        run: |
+          cd spidernet_secure_v${{ github.ref_name }}
+          zip -r ../spidernet_secure.zip .
+          cd ..
+
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v1
+        with:
+          files: spidernet_secure.zip
+name: Build & Release SpiderNet
+
+on:
   push:
     tags:
       - "v*"
