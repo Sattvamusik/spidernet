@@ -8,6 +8,60 @@ SPN_BIN="$HOME_DIR/.local/bin"
 
 echo "=== 🌻 Installing SpiderNet for $USER ==="
 
+# Download latest release ZIP
+ZIP_URL=$(curl -s https://api.github.com/repos/Sattvamusik/spidernet/releases/latest \
+  | grep "browser_download_url" \
+  | grep "spidernet_secure.zip" \
+  | cut -d '"' -f 4)
+
+if [ -z "$ZIP_URL" ]; then
+  echo "❌ Could not find spidernet_secure.zip in the latest release!"
+  exit 1
+fi
+
+TMP="/tmp/spidernet_secure.zip"
+curl -L -o "$TMP" "$ZIP_URL"
+unzip -o "$TMP" -d "$INSTALL_DIR"
+
+# Create spn launcher
+cat > "$SPN_BIN/spn" << 'EOF'
+#!/bin/bash
+BASE="$HOME/SpiderNet"
+case "$1" in
+  cockpit)  nohup python3 "$BASE/cockpit.py" >/dev/null 2>&1 & echo "🌻 Cockpit started" ;;
+  clean)    bash "$BASE/cleaner.sh" ;;
+  health)   bash "$BASE/hospital.sh" ;;
+  trauma)   bash "$BASE/trauma.sh" ;;
+  sync)     python3 "$BASE/agents/SpiderSync/spidersync.py" ;;
+  *)        echo "Usage: spn [cockpit|clean|health|trauma|sync]" ;;
+esac
+EOF
+chmod +x "$SPN_BIN/spn"
+
+# Desktop shortcut
+cat > "$HOME_DIR/Desktop/spidernet.desktop" << EOL
+[Desktop Entry]
+Name=SpiderNet Cockpit
+Comment=Self-Healing Dashboard
+Exec=spn cockpit
+Icon=$INSTALL_DIR/assets/sunflower.png
+Terminal=false
+Type=Application
+Categories=Utility;
+EOL
+chmod +x "$HOME_DIR/Desktop/spidernet.desktop"
+
+echo "✅ Install complete! Run: spn cockpit"
+#!/bin/bash
+set -euo pipefail
+
+USER=$(whoami)
+HOME_DIR="/home/$USER"
+INSTALL_DIR="$HOME_DIR/SpiderNet"
+SPN_BIN="$HOME_DIR/.local/bin"
+
+echo "=== 🌻 Installing SpiderNet for $USER ==="
+
 # 1. Download latest release ZIP
 ZIP_URL=$(curl -s https://api.github.com/repos/Sattvamusik/spidernet/releases/latest \
   | grep "browser_download_url" | grep "spidernet_secure.zip" | cut -d '"' -f 4)
