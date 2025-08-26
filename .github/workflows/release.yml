@@ -8,19 +8,27 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Prepare ZIP (bundle everything)
+      - name: Prepare ZIP (bundle everything + installers)
         run: |
           mkdir -p dist
+          # Copy installers into root before zipping
+          cp install.sh dist/ || true
+          cp install.ps1 dist/ || true
           zip -r dist/spidernet_secure.zip . \
+            install.sh install.ps1 \
             -x "*.git*" ".github/*"
 
       - name: Upload Release Asset
         uses: softprops/action-gh-release@v1
         with:
-          files: dist/spidernet_secure.zip
+          files: |
+            dist/spidernet_secure.zip
+            dist/install.sh
+            dist/install.ps1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
