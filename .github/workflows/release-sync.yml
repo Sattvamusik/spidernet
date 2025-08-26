@@ -1,3 +1,30 @@
+name: Build GiftWrap ZIP
+
+on:
+  push:
+    branches: [main]
+  release:
+    types: [published]
+
+jobs:
+  giftwrap:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Build ZIP
+        run: |
+          VERSION=$(date +'%Y.%m.%d.%H%M')
+          mkdir -p dist
+          zip -r dist/spidernet_secure_${VERSION}.zip . \
+            -x ".git*" -x "dist/*" -x ".github/*"
+
+      - name: Upload ZIP (Release)
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/*.zip
 name: GiftWrap Sync
 
 on:
