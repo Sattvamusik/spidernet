@@ -1,6 +1,33 @@
 Write-Host "=== 🌻 Installing SpiderNet (Windows) ===" -ForegroundColor Cyan
 
 $InstallDir = "$env:USERPROFILE\SpiderNet"
+$ZipPath    = "$env:TEMP\spidernet_secure.zip"
+
+# Get latest release ZIP
+$ReleaseInfo = Invoke-RestMethod https://api.github.com/repos/Sattvamusik/spidernet/releases/latest
+$ZipUrl = $ReleaseInfo.assets | Where-Object { $_.name -eq "spidernet_secure.zip" } | Select-Object -ExpandProperty browser_download_url
+
+if (-not $ZipUrl) {
+  Write-Error "❌ Could not find spidernet_secure.zip in latest release"
+  exit 1
+}
+
+Invoke-WebRequest -Uri $ZipUrl -OutFile $ZipPath
+Expand-Archive -Force $ZipPath -DestinationPath $InstallDir
+
+# Create shortcut on Desktop
+$WshShell = New-Object -ComObject WScript.Shell
+$Shortcut = $WshShell.CreateShortcut("$env:USERPROFILE\Desktop\SpiderNet Cockpit.lnk")
+$Shortcut.TargetPath = "python"
+$Shortcut.Arguments = "`"$InstallDir\cockpit.py`""
+$Shortcut.WorkingDirectory = $InstallDir
+$Shortcut.IconLocation = "$InstallDir\assets\sunflower.png"
+$Shortcut.Save()
+
+Write-Host "✅ Installed! Run from Desktop shortcut or 'spn cockpit'." -ForegroundColor Green
+Write-Host "=== 🌻 Installing SpiderNet (Windows) ===" -ForegroundColor Cyan
+
+$InstallDir = "$env:USERPROFILE\SpiderNet"
 New-Item -ItemType Directory -Path $InstallDir -Force | Out-Null
 
 # Get latest release ZIP
