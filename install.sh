@@ -1,3 +1,20 @@
+#!/bin/bash
+set -e
+INSTALL_DIR="$HOME/SpiderNet"
+ZIP="$INSTALL_DIR/spidernet_secure.zip"
+
+echo "🌻 Installing SpiderNet..."
+mkdir -p "$INSTALL_DIR"
+
+curl -fsSL https://github.com/Sattvamusik/spidernet/releases/latest/download/spidernet_secure.zip -o "$ZIP"
+unzip -o "$ZIP" -d "$INSTALL_DIR"
+
+sudo apt update -y && sudo apt install -y python3-pyqt5 python3-pil python3-tk
+
+echo "export PATH=\"$INSTALL_DIR:\$PATH\"" >> ~/.bashrc
+echo '(sleep 5 && python3 $HOME/SpiderNet/cockpit.py &)' >> ~/.bashrc
+
+echo "✅ Installed. Run: python3 ~/SpiderNet/cockpit.py"
 name: Build & Release SpiderNet
 
 on:
