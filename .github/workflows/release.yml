@@ -1,3 +1,30 @@
+name: Build & Release SpiderNet
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Zip SpiderNet
+        run: |
+          zip -r spidernet_secure.zip \
+            agents assets \
+            install.sh install.ps1 \
+            cockpit.py PROJECTS.md IDEAS.md README.md
+
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v1
+        with:
+          files: spidernet_secure.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 release-builder workflow that automatically:
 
 Zips up the repo into spidernet_secure_v3.3.zip.
