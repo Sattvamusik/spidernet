@@ -1,4 +1,102 @@
 #!/usr/bin/env python3
+import sys, os
+from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+
+BASE = os.path.expanduser("~/.spidernet")
+SPIDERNET_DIR = os.path.expanduser("~/SpiderNet")
+os.makedirs(SPIDERNET_DIR, exist_ok=True)
+
+def ensure_file(path: str, default: str):
+    """Ensure a file exists, otherwise create it with default content"""
+    if not os.path.exists(path):
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(default)
+    with open(path, "r", encoding="utf-8") as f:
+        return f.read()
+
+class ProjectsTab(QWidget):
+    def __init__(self):
+        super().__init__()
+        layout = QVBoxLayout()
+        self.text = QTextEdit()
+        self.text.setReadOnly(False)
+        self.path = os.path.join(SPIDERNET_DIR, "PROJECTS.md")
+        self.text.setPlainText(ensure_file(
+            self.path,
+            "# Projects\n\n- Example Project"
+        ))
+        layout.addWidget(self.text)
+        self.setLayout(layout)
+    def save(self):
+        with open(self.path, "w", encoding="utf-8") as f:
+            f.write(self.text.toPlainText())
+
+class IdeasTab(QWidget):
+    def __init__(self):
+        super().__init__()
+        layout = QVBoxLayout()
+        self.text = QTextEdit()
+        self.text.setReadOnly(False)
+        self.path = os.path.join(SPIDERNET_DIR, "IDEAS.md")
+        self.text.setPlainText(ensure_file(
+            self.path,
+            "# Ideas\n\n- Example Idea"
+        ))
+        layout.addWidget(self.text)
+        self.setLayout(layout)
+    def save(self):
+        with open(self.path, "w", encoding="utf-8") as f:
+            f.write(self.text.toPlainText())
+
+class SpiderNetCockpit(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("🌻 SpiderNet Cockpit")
+        self.resize(800, 600)
+        self.setStyleSheet("background: #1e1e1e; color: white; font-family: Arial;")
+
+        # Tabs
+        self.tabs = QTabWidget()
+        self.projects = ProjectsTab()
+        self.ideas = IdeasTab()
+
+        # Control tab
+        control = QWidget()
+        grid = QGridLayout()
+        buttons = [
+            ("🏥 Hospital", "spn health"),
+            ("🚑 Trauma", "spn trauma"),
+            ("🧹 Clean", "spn clean"),
+            ("🕸️ SpiderSync", "spn sync"),
+            ("🔄 Reset", "rm -rf ~/.spidernet/logs/*"),
+            ("🔁 Update", "curl -fsSL https://github.com/Sattvamusik/spidernet/releases/latest/download/install.sh | bash")
+        ]
+        for i, (label, cmd) in enumerate(buttons):
+            btn = QPushButton(label)
+            btn.setStyleSheet("padding: 15px; font-size: 16px; background: #3a3a3a; color: white; border-radius: 8px;")
+            btn.clicked.connect(lambda _, c=cmd: os.system(c + " &"))
+            grid.addWidget(btn, i//2, i%2)
+        control.setLayout(grid)
+
+        # Tabs
+        self.tabs.addTab(control, "⚙️ Control")
+        self.tabs.addTab(self.projects, "📓 Projects")
+        self.tabs.addTab(self.ideas, "💡 Ideas")
+        self.setCentralWidget(self.tabs)
+
+    def closeEvent(self, event):
+        self.projects.save()
+        self.ideas.save()
+        event.accept()
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    window = SpiderNetCockpit()
+    window.show()
+    sys.exit(app.exec_())
+#!/usr/bin/env python3
 import tkinter as tk
 from tkinter import ttk, scrolledtext, messagebox
 import os
