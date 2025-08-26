@@ -1,3 +1,44 @@
+# 🌻 SpiderNet v4.0 Installer (Windows PowerShell)
+
+$ErrorActionPreference = "Stop"
+$Base = "$env:USERPROFILE\.spidernet"
+$InstallDir = "$env:USERPROFILE\SpiderNet"
+$Bin = "$env:USERPROFILE\.spidernet\bin"
+$ZipUrl = "https://github.com/Sattvamusik/spidernet/releases/latest/download/spidernet_secure.zip"
+
+Write-Host "🌻 Installing SpiderNet v4.0 Sunflower Cockpit..."
+
+# Ensure dirs
+New-Item -ItemType Directory -Force -Path $Base, $InstallDir, $Bin | Out-Null
+
+# Download ZIP
+$ZipPath = "$env:TEMP\spidernet_secure.zip"
+Invoke-WebRequest -Uri $ZipUrl -OutFile $ZipPath
+
+# Extract
+Expand-Archive -Force -Path $ZipPath -DestinationPath $InstallDir
+
+# Ensure cockpit seeds
+$Projects = Join-Path $InstallDir "PROJECTS.md"
+$Ideas = Join-Path $InstallDir "IDEAS.md"
+if (-not (Test-Path $Projects)) { "# Projects" | Out-File -Encoding utf8 $Projects }
+if (-not (Test-Path $Ideas)) { "# Ideas" | Out-File -Encoding utf8 $Ideas }
+
+# Create spn.cmd shim
+$Shim = Join-Path $Bin "spn.cmd"
+"@echo off
+python %USERPROFILE%\SpiderNet\cockpit.py %*" | Out-File -Encoding ascii $Shim
+Set-ItemProperty $Shim -Name IsReadOnly -Value $false
+icacls $Shim /grant Everyone:F /T /C | Out-Null
+
+# Add to PATH
+$envPath = [Environment]::GetEnvironmentVariable("Path", "User")
+if ($envPath -notlike "*$Bin*") {
+    [Environment]::SetEnvironmentVariable("Path", "$envPath;$Bin", "User")
+    Write-Host "✅ Added $Bin to PATH. Restart PowerShell."
+}
+
+Write-Host "✅ Install complete. Run with: spn cockpit"
 Write-Host "🌻 Installing SpiderNet (Windows)" -ForegroundColor Cyan
 
 $InstallDir = "$env:USERPROFILE\SpiderNet"
