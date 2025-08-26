@@ -1,6 +1,55 @@
 name: Build & Release SpiderNet
 
 on:
+  push:
+    tags:
+      - 'v*'   # Runs whenever you push a tag like v3.7
+
+permissions:
+  contents: write
+
+jobs:
+  build-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Prepare release bundle
+        run: |
+          mkdir -p dist/spidernet
+          # Copy agents, assets, installers
+          cp -r agents dist/spidernet/
+          cp -r assets dist/spidernet/
+          cp install.sh install.ps1 cockpit.py dist/spidernet/ || true
+          
+          # Always embed seeded PROJECTS.md + IDEAS.md
+          echo "# Projects" > dist/spidernet/PROJECTS.md
+          echo "- Example Project" >> dist/spidernet/PROJECTS.md
+          echo "# Ideas" > dist/spidernet/IDEAS.md
+          echo "- Example Idea" >> dist/spidernet/IDEAS.md
+
+          # Zip everything
+          cd dist
+          zip -r spidernet_secure.zip spidernet
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            dist/spidernet_secure.zip
+            install.sh
+            install.ps1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+name: Build & Release SpiderNet
+
+on:
   release:
     types: [created]
 
