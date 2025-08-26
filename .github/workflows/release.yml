@@ -1,0 +1,7 @@
+release-builder workflow that automatically:
+
+Zips up the repo into spidernet_secure_v3.3.zip.
+
+Uploads that as the release asset.
+
+Lets install.sh / install.ps1 always pull the latest release asset instead of raw repo files.
