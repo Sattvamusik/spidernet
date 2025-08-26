@@ -8,6 +8,39 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create ZIP (exclude GitHub folder)
+        run: zip -r spidernet_secure.zip . -x "*.git*" ".github/*"
+
+      - name: Upload Release Assets
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            spidernet_secure.zip
+            install.sh
+            install.ps1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check ZIP
+        run: |
+          if [ ! -f spidernet_secure.zip ]; then
+            echo "❌ ZIP not found!"
+            exit 1
+          fi
+          echo "✅ ZIP created successfully"
+name: Build & Release SpiderNet
+
+on:
+  push:
+    tags:
+      - "v*.*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
