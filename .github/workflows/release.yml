@@ -1,3 +1,52 @@
+
+---
+
+# ⚙️ Updated `.github/workflows/release.yml` (v4.0+)
+
+Paste this into your repo at `.github/workflows/release.yml`:
+
+```yaml
+name: Build & Release SpiderNet
+on:
+  push:
+    tags:
+      - "v*.*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install dependencies
+        run: |
+          pip install pyqt5 pillow
+
+      - name: Create release package
+        run: |
+          mkdir -p release
+          cp install.sh install.ps1 cockpit.py release/
+          cp -r Core Agents Dashboard Modules MemoryBank Docs release/ || true
+          cp -r assets release/ || true
+          echo "# Projects" > release/PROJECTS.md
+          echo "# Ideas" > release/IDEAS.md
+          cd release && zip -r ../spidernet_secure.zip .
+
+      - name: Upload Release Assets
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            spidernet_secure.zip
+            install.sh
+            install.ps1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 name: Build & Release SpiderNet
 
 on:
