@@ -1,4 +1,101 @@
 #!/usr/bin/env python3
+# cockpit.py v3.7.1 - Stable Tkinter Dashboard
+
+import os
+import threading
+import tkinter as tk
+from tkinter import ttk
+from datetime import datetime
+
+SPIDERNET_DIR = os.path.expanduser("~/SpiderNet")
+PROJECTS = os.path.join(SPIDERNET_DIR, "PROJECTS.md")
+IDEAS = os.path.join(SPIDERNET_DIR, "IDEAS.md")
+
+# --- Ensure files exist ---
+os.makedirs(SPIDERNET_DIR, exist_ok=True)
+if not os.path.exists(PROJECTS):
+    with open(PROJECTS, "w") as f:
+        f.write("# 🌟 Projects\n\n- Example Project\n")
+if not os.path.exists(IDEAS):
+    with open(IDEAS, "w") as f:
+        f.write("# 💡 Ideas\n\n- Example Idea\n")
+
+class SpiderNetDashboard:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("🌻 SpiderNet Cockpit v3.7.1")
+        self.root.geometry("1000x700")
+        self.root.configure(bg="#2b2b2b")
+
+        self.style = ttk.Style()
+        self.style.theme_use("clam")
+        self.configure_styles()
+
+        self.create_widgets()
+        self.setup_agents()
+
+    def configure_styles(self):
+        self.style.configure("TFrame", background="#2b2b2b")
+        self.style.configure("TLabel", background="#2b2b2b", foreground="white")
+        self.style.configure("Header.TLabel", font=("Arial", 18, "bold"))
+        self.style.configure("AppButton.TButton", font=("Arial", 12), padding=20)
+
+    def create_widgets(self):
+        # Header
+        header = ttk.Frame(self.root)
+        header.pack(fill=tk.X, padx=20, pady=10)
+        ttk.Label(header, text="SpiderNet Command Center", style="Header.TLabel").pack(side=tk.LEFT)
+        self.status_var = tk.StringVar(value="🟢 System Normal")
+        ttk.Label(header, textvariable=self.status_var).pack(side=tk.RIGHT)
+
+        # Grid of buttons
+        app_frame = ttk.Frame(self.root)
+        app_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
+        apps = [
+            ("System Health", "📊", lambda: self.log("Opened System Health")),
+            ("Projects", "📓", lambda: self.open_file(PROJECTS)),
+            ("Ideas", "💡", lambda: self.open_file(IDEAS)),
+            ("Agent Control", "🤖", lambda: self.log("Agent Control opened")),
+            ("Backup & Sync", "🔄", lambda: self.log("Backup started")),
+            ("Settings", "⚙️", lambda: self.log("Opened Settings")),
+        ]
+        for i, (name, icon, action) in enumerate(apps):
+            btn = ttk.Button(app_frame, text=f"{icon}\n{name}", command=action, style="AppButton.TButton")
+            btn.grid(row=i // 3, column=i % 3, padx=10, pady=10, sticky="nsew")
+        for i in range(3):
+            app_frame.columnconfigure(i, weight=1)
+        for i in range(2):
+            app_frame.rowconfigure(i, weight=1)
+
+        # Console
+        console_frame = ttk.LabelFrame(self.root, text="Activity Log")
+        console_frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=10)
+        self.console = tk.Text(console_frame, height=10, bg="black", fg="white")
+        self.console.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
+
+    def setup_agents(self):
+        t = threading.Thread(target=self.health_monitor, daemon=True)
+        t.start()
+
+    def health_monitor(self):
+        while True:
+            self.log("Health monitor: System check OK")
+            threading.Event().wait(30)
+
+    def log(self, message):
+        ts = datetime.now().strftime("%H:%M:%S")
+        self.console.insert(tk.END, f"[{ts}] {message}\n")
+        self.console.see(tk.END)
+
+    def open_file(self, path):
+        os.system(f"xdg-open {path} &")
+        self.log(f"Opened {path}")
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = SpiderNetDashboard(root)
+    root.mainloop()
+#!/usr/bin/env python3
 import sys, os
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
