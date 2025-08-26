@@ -1,3 +1,7 @@
+$ReleaseInfo = Invoke-RestMethod https://api.github.com/repos/Sattvamusik/spidernet/releases/latest
+$ZipUrl = $ReleaseInfo.assets | Where-Object { $_.name -like "spidernet_secure.zip" } | Select-Object -ExpandProperty browser_download_url
+Invoke-WebRequest -Uri $ZipUrl -OutFile "$env:TEMP\spidernet_secure.zip"
+Expand-Archive -Force "$env:TEMP\spidernet_secure.zip" -DestinationPath $InstallDir
 # 🌻 SpiderNet Installer (Windows)
 Write-Host "=== 🕸️ Installing SpiderNet (Windows) ===" -ForegroundColor Cyan
 
