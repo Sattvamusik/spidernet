@@ -1,11 +1,5 @@
-<#
-🌻 Install script for Windows - creates desktop shortcut
-#>
-$WshShell = New-Object -ComObject WScript.Shell
-$Desktop = [System.Environment]::GetFolderPath("Desktop")
-$Shortcut = $WshShell.CreateShortcut("$Desktop\SpiderNet Cockpit.lnk")
-$Shortcut.TargetPath = "python"
-$Shortcut.Arguments = "C:\SpiderNet\cockpit.py"
-$Shortcut.IconLocation = "C:\SpiderNet\assets\sunflower.ico"
-$Shortcut.Save()
-Write-Output "🌻 Cockpit shortcut created on Desktop."
+Write-Output "🌻 Installing SpiderNet v3.1..."
+New-Item -ItemType Directory -Force -Path $HOME\SpiderNet | Out-Null
+Copy-Item PROJECTS.md -Destination $HOME\SpiderNet\PROJECTS.md -Force
+Copy-Item IDEAS.md -Destination $HOME\SpiderNet\IDEAS.md -Force
+Write-Output "✅ Installed! Run 'python %USERPROFILE%\.spidernet\cockpit.py'"
