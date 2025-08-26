@@ -5,6 +5,50 @@ set -euo pipefail
 
 USER=$(whoami)
 HOME_DIR="/home/$USER"
+INSTALL_DIR="$HOME_DIR/SpiderNet"
+SPN_BIN="$HOME_DIR/.local/bin"
+
+echo "=== 🕸️ Installing SpiderNet for $USER ==="
+
+mkdir -p "$INSTALL_DIR" "$SPN_BIN"
+
+# --- 1. Download latest release asset ---
+ZIP_URL=$(curl -s https://api.github.com/repos/Sattvamusik/spidernet/releases/latest \
+  | grep "browser_download_url" \
+  | grep "spidernet_secure.zip" \
+  | cut -d '"' -f 4)
+
+if [ -z "$ZIP_URL" ]; then
+  echo "❌ Could not find spidernet_secure.zip in the latest release!"
+  exit 1
+fi
+
+curl -L -o /tmp/spidernet_secure.zip "$ZIP_URL"
+unzip -o /tmp/spidernet_secure.zip -d "$INSTALL_DIR"
+
+# --- 2. Create launcher ---
+cat > "$SPN_BIN/spn" << 'EOF'
+#!/bin/bash
+BASE="$HOME/SpiderNet"
+case "$1" in
+  cockpit) python3 "$BASE/cockpit.py" ;;
+  hospital) bash "$BASE/hospital.sh" ;;
+  trauma) bash "$BASE/trauma.sh" ;;
+  clean) bash "$BASE/cleaner.sh" ;;
+  watchdog) bash "$BASE/watchdog.sh" ;;
+  *) echo "Usage: spn [cockpit|hospital|trauma|clean|watchdog]" ;;
+esac
+EOF
+chmod +x "$SPN_BIN/spn"
+
+echo "🌻 Installed! Run: spn cockpit"
+#!/bin/bash
+# 🌻 SpiderNet Installer (Linux/macOS)
+# Usage: curl -fsSL https://github.com/Sattvamusik/spidernet/releases/latest/download/install.sh | bash
+set -euo pipefail
+
+USER=$(whoami)
+HOME_DIR="/home/$USER"
 BASE="$HOME_DIR/.spidernet"
 SPN_BIN="$HOME_DIR/.local/bin"
 DESKTOP="$HOME_DIR/Desktop"
