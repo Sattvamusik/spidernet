@@ -1,3 +1,31 @@
+name: Build & Release SpiderNet
+
+on:
+  push:
+    tags:
+      - "v*.*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare ZIP
+        run: |
+          mkdir -p dist
+          zip -r dist/spidernet_secure.zip . -x "*.git*" ".github/*"
+
+      - name: Upload Release Assets
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            dist/spidernet_secure.zip
+            install.sh
+            install.ps1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 #!/bin/bash
 set -euo pipefail
 
