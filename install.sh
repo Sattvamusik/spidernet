@@ -1,3 +1,39 @@
+#!/bin/bash
+set -euo pipefail
+
+USER=$(whoami)
+HOME_DIR="/home/$USER"
+INSTALL_DIR="$HOME_DIR/SpiderNet"
+
+echo "=== 🌻 Installing SpiderNet (Linux/macOS) ==="
+
+# Download latest release ZIP
+ZIP_URL=$(curl -s https://api.github.com/repos/Sattvamusik/spidernet/releases/latest \
+  | grep "browser_download_url" \
+  | grep "spidernet_secure.zip" \
+  | cut -d '"' -f 4)
+
+if [ -z "$ZIP_URL" ]; then
+  echo "❌ Could not find spidernet_secure.zip in the latest release!"
+  exit 1
+fi
+
+TMP_ZIP="/tmp/spidernet_secure.zip"
+curl -L -o "$TMP_ZIP" "$ZIP_URL"
+mkdir -p "$INSTALL_DIR"
+unzip -o "$TMP_ZIP" -d "$INSTALL_DIR"
+
+# Add launcher
+mkdir -p "$HOME_DIR/.local/bin"
+cat > "$HOME_DIR/.local/bin/spn" <<'EOF'
+#!/bin/bash
+python3 ~/SpiderNet/cockpit.py
+EOF
+chmod +x "$HOME_DIR/.local/bin/spn"
+
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME_DIR/.bashrc"
+
+echo "✅ Install complete! Run: spn"
 ZIP_URL=$(curl -s https://api.github.com/repos/Sattvamusik/spidernet/releases/latest \
   | grep "browser_download_url" \
   | grep "spidernet_secure.zip" \
