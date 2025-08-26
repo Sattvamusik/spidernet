@@ -1,3 +1,14 @@
+Write-Host "🌻 Installing SpiderNet (Windows)" -ForegroundColor Cyan
+
+$InstallDir = "$env:USERPROFILE\SpiderNet"
+$ZipPath = "$env:TEMP\spidernet_secure.zip"
+
+New-Item -ItemType Directory -Path $InstallDir -Force | Out-Null
+Invoke-WebRequest -Uri "https://github.com/Sattvamusik/spidernet/releases/latest/download/spidernet_secure.zip" -OutFile $ZipPath
+Expand-Archive -Path $ZipPath -DestinationPath $InstallDir -Force
+
+Write-Host "✅ Installed to $InstallDir" -ForegroundColor Green
+Write-Host "Run Cockpit with: python $InstallDir\cockpit.py"
 Write-Host "=== 🌻 Installing SpiderNet (Windows) ===" -ForegroundColor Cyan
 
 $InstallDir = "$env:USERPROFILE\SpiderNet"
