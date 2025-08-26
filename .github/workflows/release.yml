@@ -8,6 +8,42 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Make ZIP package
+        run: |
+          mkdir -p dist
+          zip -r dist/spidernet_secure.zip . -x "*.git*" ".github/*"
+          echo "=== ZIP CONTENTS ==="
+          unzip -l dist/spidernet_secure.zip
+
+      - name: Upload Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            dist/spidernet_secure.zip
+            install.sh
+            install.ps1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+name: Build & Release SpiderNet
+
+on:
+  push:
+    tags:
+      - "v*.*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -485,3 +521,5 @@ Zips up the repo into spidernet_secure_v3.3.zip.
 Uploads that as the release asset.
 
 Lets install.sh / install.ps1 always pull the latest release asset instead of raw repo files.
+
+
