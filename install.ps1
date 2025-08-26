@@ -1,3 +1,28 @@
+name: Build & Release SpiderNet
+
+on:
+  push:
+    tags:
+      - "v*.*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Zip SpiderNet
+        run: |
+          mkdir -p dist
+          zip -r dist/spidernet_secure.zip . -x "*.git*"
+
+      - name: Upload Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/spidernet_secure.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 # 🌻 SpiderNet Installer (Windows)
 Write-Host "=== 🕸️ Installing SpiderNet (Windows) ===" -ForegroundColor Cyan
 
