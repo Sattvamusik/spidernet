@@ -4,6 +4,49 @@ set -euo pipefail
 USER=$(whoami)
 HOME_DIR="/home/$USER"
 INSTALL_DIR="$HOME_DIR/SpiderNet"
+SPN_BIN="$HOME_DIR/.local/bin"
+
+echo "=== 🌻 Installing SpiderNet for $USER ==="
+
+# 1. Download latest release ZIP
+ZIP_URL=$(curl -s https://api.github.com/repos/Sattvamusik/spidernet/releases/latest \
+  | grep "browser_download_url" | grep "spidernet_secure.zip" | cut -d '"' -f 4)
+
+if [ -z "$ZIP_URL" ]; then
+  echo "❌ Could not find spidernet_secure.zip in latest release"
+  exit 1
+fi
+
+curl -L -o /tmp/spidernet_secure.zip "$ZIP_URL"
+rm -rf "$INSTALL_DIR"
+unzip /tmp/spidernet_secure.zip -d "$INSTALL_DIR"
+
+# 2. Create spn launcher
+mkdir -p "$SPN_BIN"
+cat > "$SPN_BIN/spn" <<'EOF'
+#!/bin/bash
+BASE="$HOME/SpiderNet"
+case "$1" in
+  cockpit) python3 "$BASE/cockpit.py" ;;
+  hospital) bash "$BASE/agents/hospital.sh" ;;
+  trauma) bash "$BASE/agents/trauma.sh" ;;
+  clean) bash "$BASE/agents/cleaner.sh" ;;
+  sync) python3 "$BASE/agents/spidersync.py" ;;
+  *) echo "Usage: spn [cockpit|hospital|trauma|clean|sync]" ;;
+esac
+EOF
+chmod +x "$SPN_BIN/spn"
+
+# 3. Add PATH if missing
+grep -q "$SPN_BIN" ~/.bashrc || echo "export PATH=\"$SPN_BIN:\$PATH\"" >> ~/.bashrc
+
+echo "✅ Install complete! Run: spn cockpit"
+#!/bin/bash
+set -euo pipefail
+
+USER=$(whoami)
+HOME_DIR="/home/$USER"
+INSTALL_DIR="$HOME_DIR/SpiderNet"
 
 echo "=== 🌻 Installing SpiderNet (Linux/macOS) ==="
 
