@@ -1,3 +1,68 @@
+name: 🚀 SpiderNet GiftWrap Builder
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - "agents/**"
+      - "assets/**"
+      - "install.sh"
+      - "install.ps1"
+      - "cockpit.py"
+      - "PROJECTS.md"
+      - "IDEAS.md"
+  workflow_dispatch:
+  release:
+    types: [created]
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Checkout repo
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Set up Python (for preflight tests)
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # 3. Install test deps
+      - name: 📦 Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyqt5 pillow
+
+      # 4. Run quick syntax check (no broken scripts)
+      - name: ✅ Preflight test
+        run: |
+          python -m py_compile cockpit.py || exit 1
+          echo "Preflight ✅"
+
+      # 5. Build ZIP package
+      - name: 🎁 Build GiftWrap ZIP
+        run: |
+          mkdir -p build
+          zip -r build/spidernet_secure.zip \
+            agents/ assets/ cockpit.py \
+            install.sh install.ps1 \
+            PROJECTS.md IDEAS.md README.md
+
+      # 6. Upload ZIP to release (if release triggered)
+      - name: 🚀 Upload release asset
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/spidernet_secure.zip
+
+      # 7. Upload artifact (always available in Actions tab)
+      - name: 📤 Upload artifact (CI only)
+        uses: actions/upload-artifact@v4
+        with:
+          name: spidernet_secure
+          path: build/spidernet_secure.zip
 name: Build GiftWrap ZIP
 
 on:
@@ -217,3 +282,4 @@ jobs:
           git commit -m "🌻 Auto-sync from Release ZIP" || echo "No changes to commit"
           git push origin main
 Auto-Sync from Release ZIP
+
