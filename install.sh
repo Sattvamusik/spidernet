@@ -1,3 +1,65 @@
+#!/bin/bash
+# 🌻 SpiderNet Installer (Linux/macOS)
+# Usage: curl -fsSL https://github.com/Sattvamusik/spidernet/releases/latest/download/install.sh | bash
+set -euo pipefail
+
+USER=$(whoami)
+HOME_DIR="/home/$USER"
+BASE="$HOME_DIR/.spidernet"
+SPN_BIN="$HOME_DIR/.local/bin"
+DESKTOP="$HOME_DIR/Desktop"
+ASSETS="$BASE/assets"
+
+echo "=== 🌻 Installing SpiderNet for $USER ==="
+
+# 1. Create dirs
+mkdir -p "$BASE" "$SPN_BIN" "$ASSETS" "$HOME_DIR/SpiderNet"
+
+# 2. Install deps
+sudo apt update -y
+sudo apt install -y python3-pyqt5 python3-pil xdg-utils zenity libnotify-bin > /dev/null 2>&1 || true
+
+# 3. Fetch latest release asset (zip)
+TMP="/tmp/spidernet.zip"
+curl -L -o "$TMP" https://github.com/Sattvamusik/spidernet/releases/latest/download/spidernet_secure.zip
+unzip -o "$TMP" -d "$BASE"
+
+# 4. Pre-seed PROJECTS.md / IDEAS.md if missing
+[ ! -f "$HOME_DIR/SpiderNet/PROJECTS.md" ] && echo "# Projects" > "$HOME_DIR/SpiderNet/PROJECTS.md"
+[ ! -f "$HOME_DIR/SpiderNet/IDEAS.md" ] && echo "# Ideas" > "$HOME_DIR/SpiderNet/IDEAS.md"
+
+# 5. Create spn launcher
+cat > "$SPN_BIN/spn" << 'EOF'
+#!/bin/bash
+BASE="$HOME/.spidernet"
+case "$1" in
+  cockpit)   nohup python3 "$BASE/cockpit.py" >/dev/null 2>&1 & echo "🌻 Cockpit started" ;;
+  clean)     "$BASE/cleaner.sh" ;;
+  health)    "$BASE/hospital.sh" ;;
+  trauma)    "$BASE/trauma.sh" ;;
+  sync)      python3 "$BASE/spidersync.py" ;;
+  *)         echo "Usage: spn [cockpit|clean|health|trauma|sync]" ;;
+esac
+EOF
+chmod +x "$SPN_BIN/spn"
+
+# 6. Add PATH if missing
+grep -q "$SPN_BIN" ~/.bashrc || echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+
+# 7. Desktop shortcut
+cat > "$DESKTOP/spidernet.desktop" << EOL
+[Desktop Entry]
+Name=SpiderNet Cockpit
+Comment=Self-Healing Dashboard
+Exec=spn cockpit
+Icon=$ASSETS/sunflower.png
+Terminal=false
+Type=Application
+Categories=Utility;
+EOL
+chmod +x "$DESKTOP/spidernet.desktop"
+
+echo "✅ Install complete! Run: spn cockpit"
 name: Build & Release SpiderNet
 
 on:
