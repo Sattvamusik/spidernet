@@ -1,3 +1,40 @@
+name: Build & Release SpiderNet
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Prepare bundle
+        run: |
+          mkdir -p bundle/agents bundle/assets
+          cp agents/* bundle/agents/ || true
+          cp assets/* bundle/assets/ || true
+          cp cockpit.py bundle/ || true
+          cp install.sh bundle/
+          cp install.ps1 bundle/
+          echo "# 🌟 My Projects" > bundle/PROJECTS.md
+          echo "# 💡 My Ideas" > bundle/IDEAS.md
+          cd bundle && zip -r ../spidernet_secure.zip *
+
+      - name: Upload release asset
+        uses: softprops/action-gh-release@v1
+        with:
+          files: spidernet_secure.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 #!/bin/bash
 set -euo pipefail
 
