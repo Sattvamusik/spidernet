@@ -12,6 +12,44 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Prepare dist folder
+        run: |
+          mkdir -p dist
+          mkdir -p dist/agents dist/assets
+          
+          # Copy core files
+          cp -r agents assets cockpit.py install.sh install.ps1 README.md dist/
+
+          # Always embed dummy PROJECTS.md + IDEAS.md
+          echo "# Projects" > dist/PROJECTS.md
+          echo "# Ideas" > dist/IDEAS.md
+
+      - name: Zip SpiderNet
+        run: |
+          cd dist
+          zip -r ../spidernet_secure.zip ./*
+          cd ..
+
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v1
+        with:
+          files: spidernet_secure.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+name: Build & Release SpiderNet
+
+on:
+  push:
+    tags:
+      - "v*.*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Prepare ZIP
         run: |
           mkdir -p dist
