@@ -41,3 +41,7 @@ npm test
 - [ ] local run verified
 - [ ] tests verified
 - [ ] docs verified
+
+## Scaffold status
+- Next.js scaffold merged on 2026-04-12
+- Node 20 used through nvm
