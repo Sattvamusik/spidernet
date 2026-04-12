@@ -1,0 +1,11 @@
+SpiderNet Project Manifest
+Created: 2026-04-12
+Project name: SpiderNet Control Deck
+Project slug: spidernet-control-deck
+Target user: internal ops team
+Stack: Next.js + Node + Tailwind
+Base dir: /home/sattv/projects
+Project root: /home/sattv/projects/spidernet-control-deck
+Bootstrap source: /home/sattv/SpiderNet_Master
+Bootstrap version: v2-fixed
+Generated at: 2026-04-12 22:34:29

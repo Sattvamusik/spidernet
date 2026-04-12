@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "Running basic SpiderNet pre-commit checks..."
+
+STAGED_FILES="$(git diff --cached --name-only || true)"
+
+# Block real env files, but allow .env.example
+if echo "$STAGED_FILES" | grep -E '(^|/)\.env($|\.local$|\.production$|\.development$|\.test$)' >/dev/null 2>&1; then
+  echo "ERROR: Refusing to commit real .env files"
+  exit 1
+fi
+
+echo "Pre-commit checks passed."

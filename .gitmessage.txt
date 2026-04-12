@@ -1,0 +1,14 @@
+# <type>: <short summary>
+#
+# Types:
+# feat     new feature
+# fix      bug fix
+# docs     documentation
+# chore    maintenance
+# refactor internal change without behavior change
+# test     tests
+#
+# Body:
+# - what changed
+# - why
+# - follow-up if needed
