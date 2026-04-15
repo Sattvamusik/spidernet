@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "lastWrittenAt": "",
+  "tiers": [
+    {
+      "tier": "cloud_primary",
+      "status": "prepared",
+      "lastProbedAt": "",
+      "note": "Scaffold only. No live handshake verified."
+    },
+    {
+      "tier": "cloud_mini",
+      "status": "prepared",
+      "lastProbedAt": "",
+      "note": "Scaffold only. No live handshake verified."
+    },
+    {
+      "tier": "local_ollama",
+      "status": "prepared",
+      "lastProbedAt": "",
+      "note": "Scaffold only. No live handshake verified."
+    }
+  ]
+}
