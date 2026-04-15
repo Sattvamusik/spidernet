@@ -1,5 +1,100 @@
 # Worklog
 
+## 2026-04-16 — Ollama runtime truth path restored for white SETU
+### Done
+- Restored the documented Ollama runtime config path in `src/lib/spidernet/storage.ts` so white SETU now reads `artifacts/runtime/spidernet/config/ollama.json` first.
+- Kept backward compatibility by falling back to the older `registries/ollama.json` path if a legacy repo state still has it.
+- Added the explicit scaffold file at `artifacts/runtime/spidernet/config/ollama.json` and surfaced its note in the Brain and Memory surfaces.
+- Left the white Setu UI family, Dash 001 intake flow, freeze, mirror, and recovery posture unchanged.
+
+### Verified
+- `npm run lint` passed.
+- `npx tsc --noEmit` passed.
+- `npm run build` passed.
+
+### Failed
+- `npm run dev -- --hostname 127.0.0.1 --port 3000` failed in this sandbox with `listen EPERM`, so live HTTP route checks could not run here.
+
+### Active
+- White SETU now has one documented Ollama truth path with legacy fallback.
+
+### Remaining
+- Live HTTP route checks remain blocked unless local port binding is available.
+
+### Risks / blockers
+- Ollama remains scaffold-only and should not be treated as a live execution lane.
+
+## 2026-04-16 — bridge continuity and Brain posture surfaced in white SETU
+### Done
+- Added read-only bridge continuity status in `src/lib/spidernet/data.ts` by scanning the existing freeze, mirror, and recovery artifact trees.
+- Extended the shared dashboard snapshot contract in `src/lib/spidernet/types.ts` with Brain and continuity status so the white SETU UI can show those states without changing the intake flow.
+- Added a new Bridge Continuity panel to the overview board and replaced the observatory rollback summary with Brain plus freeze, mirror, and recovery posture.
+- Left Dash 001 intake behavior and the white UI direction unchanged.
+
+### Verified
+- `npm run lint` passed.
+- `npm run build` passed.
+- The built output contains the new continuity and Brain posture strings in `.next/server/chunks/131.js`.
+
+### Failed
+- `npm run dev -- --hostname 127.0.0.1 --port 3000` failed in this sandbox with `listen EPERM`, so live HTTP route checks could not run here.
+
+### Active
+- White SETU now exposes Brain and continuity posture as read-only bridge-deck context.
+
+### Remaining
+- Re-run live route checks for `/` and `/boards/observatory` in an environment that permits local port binding.
+- Decide the runtime truth path for Ollama posture because the live repo currently has no `artifacts/runtime/spidernet/config/ollama.json` file.
+
+### Risks / blockers
+- Brain posture is still inventory-derived and should not be treated as proof of live provider execution.
+
+## 2026-04-16 — white Setu verification-path hardening
+### Done
+- Removed the remote `next/font/google` dependency from `src/app/layout.tsx` and kept the current white Setu typography through local fallback stacks in `src/app/globals.css`.
+- Updated `package.json` so `npm run build` now uses `next build --webpack`, which is the stable production build path in this sandbox.
+- Added `.venv-tools/**` to `eslint.config.mjs` ignores so `npm run lint` stays scoped to repo source.
+- Tightened `src/lib/spidernet/data.ts` typing so lint and typecheck pass without changing board behavior.
+- Preserved the white Setu UI, Dash routes, and Dash 001 redirect behavior.
+
+### Verified
+- `npm run lint` passed.
+- `npx tsc --noEmit` passed.
+- `npm run build` passed.
+- Direct invocation of the compiled Dash 001 intake route returned `303` to `http://127.0.0.1:3000/boards/input-data`.
+- The compiled Dash 001 intake route increased `artifacts/runtime/spidernet/packets/intake.json` from 8 to 9 records.
+- The compiled Dash 001 intake route increased `artifacts/runtime/spidernet/ledger/events.json` from 9 to 11 records.
+
+### Active
+- White Setu remains the live product surface.
+- Dash 001 intake still writes packets and append-only ledger events through the existing route.
+
+### Remaining
+- Verify live HTTP startup and browser route checks in an environment that permits local port binding.
+- Replace the route-level coding-flow ledger follow-up with shared harness-ledger wiring when that bridge is ready.
+
+### Risks / blockers
+- `npm run dev -- --hostname 127.0.0.1 --port 3000` could not be verified here because the sandbox rejects local port binding with `listen EPERM`.
+
+## 2026-04-16 — Dash 001 local-only brain enforcement
+### Done
+- Corrected `src/lib/spidernet/brain-manager.ts` so `local_only` privacy mode no longer falls through to a cloud tier when the local brain lane is unavailable.
+- Updated `src/lib/spidernet/coding-flow.ts` so the brain selection hold now participates in the coding-flow preflight result.
+- Kept the white SETU UI unchanged and left the existing Dash 001 intake route intact.
+
+### Verified
+- `npm run lint` passed.
+- `npm run build` passed.
+
+### Active
+- Dash 001 intake still writes packets and ledger events through the existing white SETU flow.
+
+### Remaining
+- Runtime route and POST smoke checks remain blocked in this sandbox because the Next dev server cannot bind a local port here.
+
+### Risks / blockers
+- The local brain lane is still not live, so `local_only` intake preflight now truthfully holds until that lane is available or the policy changes.
+
 ## 2026-04-15 — Dash 001 coding-flow outcome ledger follow-up
 ### Done
 - Added one append-only ledger event in `src/app/api/spidernet/intake/route.ts` so the Dash 001 coding-flow preflight result is persisted alongside the intake packet.

@@ -12,6 +12,7 @@ export type BrainSelectionResult = {
   tier: BrainTier;
   reason: string;
   fallbackChain: BrainTier[];
+  holdReason: string | null;
 };
 
 export function selectBrain(input: BrainSelectionInput): BrainSelectionResult {
@@ -25,6 +26,16 @@ export function selectBrain(input: BrainSelectionInput): BrainSelectionResult {
       tier: "local_ollama",
       reason: "Local-only privacy mode requested.",
       fallbackChain: [],
+      holdReason: null,
+    };
+  }
+
+  if (privacyMode === "local_only" && !localAvailable) {
+    return {
+      tier: "local_ollama",
+      reason: "Local-only privacy mode requested, but no live local brain is available.",
+      fallbackChain: [],
+      holdReason: "Local-only privacy mode requires a live local brain, but the local lane is unavailable.",
     };
   }
 
@@ -33,6 +44,7 @@ export function selectBrain(input: BrainSelectionInput): BrainSelectionResult {
       tier: "cloud_primary",
       reason: "High-complexity task routed to primary cloud model.",
       fallbackChain: ["cloud_mini", "local_ollama"].filter((x) => (x === "cloud_mini" ? miniAvailable : localAvailable)) as BrainTier[],
+      holdReason: null,
     };
   }
 
@@ -41,6 +53,7 @@ export function selectBrain(input: BrainSelectionInput): BrainSelectionResult {
       tier: "cloud_mini",
       reason: "Mini selected for bounded implementation work.",
       fallbackChain: ["local_ollama"].filter(() => localAvailable) as BrainTier[],
+      holdReason: null,
     };
   }
 
@@ -49,6 +62,7 @@ export function selectBrain(input: BrainSelectionInput): BrainSelectionResult {
       tier: "local_ollama",
       reason: "Cloud mini unavailable; falling back to local Ollama.",
       fallbackChain: [],
+      holdReason: null,
     };
   }
 
@@ -56,5 +70,6 @@ export function selectBrain(input: BrainSelectionInput): BrainSelectionResult {
     tier: "cloud_primary",
     reason: "Fallback default when no other execution tier is available.",
     fallbackChain: [],
+    holdReason: null,
   };
 }

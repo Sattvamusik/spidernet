@@ -1,5 +1,29 @@
 # Changes
 
+## 2026-04-16 — Ollama runtime truth path restored
+- changed Setu runtime storage to read the documented `artifacts/runtime/spidernet/config/ollama.json` path first
+- kept backward compatibility through a legacy fallback to `artifacts/runtime/spidernet/registries/ollama.json`
+- added the missing scaffold config file under `artifacts/runtime/spidernet/config/ollama.json`
+- exposed the Ollama scaffold note in the dashboard so Brain posture does not imply live runtime proof
+
+## 2026-04-16 — bridge continuity and Brain posture surfaced in white SETU
+- added read-only freeze, mirror, and recovery status to the dashboard snapshot from the existing artifact trees
+- added Brain posture status from the current runtime inventory and exposed it in the observatory
+- added a new Bridge Continuity panel to the overview board
+- preserved the white Setu UI and left Dash 001 intake behavior unchanged
+
+## 2026-04-16 — white Setu verification-path hardening
+- removed the remote Google font fetch path and preserved the same white Setu typography through local fallback stacks
+- changed `npm run build` to `next build --webpack` so production builds pass in this sandbox
+- added `.venv-tools/**` to ESLint ignores so lint stays focused on repo source
+- tightened `src/lib/spidernet/data.ts` typing to clear lint and typecheck without changing behavior
+- verified the built Dash 001 intake route still returns `303` and appends intake plus ledger records
+
+## 2026-04-16 — Dash 001 local-only brain enforcement
+- fixed the brain selector so `local_only` mode no longer silently falls back to a cloud tier when the local lane is unavailable
+- updated the coding-flow preflight hold logic to include brain-lane enforcement
+- preserved the white SETU UI and existing Dash 001 intake route shape
+
 ## 2026-04-15 — Dash 001 coding-flow outcome persistence
 - added one append-only ledger event in the Dash 001 intake POST route so the coding-flow preflight result is stored as a structured local record
 - kept the intake packet creation path intact

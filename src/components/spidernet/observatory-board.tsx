@@ -80,16 +80,31 @@ export function ObservatoryBoard({ snapshot }: ObservatoryBoardProps) {
         </div>
 
         <div className="rounded-[30px] border border-cyan-200 bg-cyan-50/70 p-5 shadow-[0_16px_60px_rgba(15,23,42,0.06)]">
-          <p className="text-xs uppercase tracking-[0.22em] text-cyan-700">Rollback posture</p>
+          <p className="text-xs uppercase tracking-[0.22em] text-cyan-700">Brain and recovery posture</p>
           <div className="mt-4 space-y-3 text-sm text-slate-700">
             <div className="rounded-[22px] border border-cyan-100 bg-white/90 px-4 py-3">
-              Lint and build stay mandatory before release.
+              Brain: {snapshot.brainStatus.posture}
             </div>
             <div className="rounded-[22px] border border-cyan-100 bg-white/90 px-4 py-3">
-              Manual hold remains a live fallback whenever wrapper certainty is weak.
+              Context: {snapshot.brainStatus.memorySignal}
             </div>
             <div className="rounded-[22px] border border-cyan-100 bg-white/90 px-4 py-3">
-              Ledger history is append-only, so routing and validation evidence can be reviewed later.
+              Local lane: {snapshot.brainStatus.localLaneSignal}
+            </div>
+            <div className="rounded-[22px] border border-cyan-100 bg-white/90 px-4 py-3">
+              Ollama: {snapshot.brainStatus.ollamaSignal}
+            </div>
+            <div className="rounded-[22px] border border-cyan-100 bg-white/90 px-4 py-3">
+              Freeze: {snapshot.continuityStatus.freeze.detail}
+            </div>
+            <div className="rounded-[22px] border border-cyan-100 bg-white/90 px-4 py-3">
+              Mirror: {snapshot.continuityStatus.mirror.detail}
+            </div>
+            <div className="rounded-[22px] border border-cyan-100 bg-white/90 px-4 py-3">
+              Recovery: {snapshot.continuityStatus.recovery.detail}
+            </div>
+            <div className="rounded-[22px] border border-cyan-100 bg-white/90 px-4 py-3">
+              Guardrail: {snapshot.brainStatus.note}
             </div>
           </div>
         </div>

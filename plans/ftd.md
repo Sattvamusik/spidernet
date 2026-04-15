@@ -1,5 +1,26 @@
 # FTD — Future To Do
 
+## 2026-04-16 — Ollama runtime truth path restored
+- White SETU now has the documented `artifacts/runtime/spidernet/config/ollama.json` scaffold in place, with legacy fallback preserved for older repo states.
+- `npm run lint`, `npx tsc --noEmit`, and `npm run build` passed for the contract fix.
+- Remaining gap: the config file is still scaffold-only and does not prove a live Ollama handshake.
+- Remaining gap: live route verification for the updated Memory and Brain posture still needs an environment that permits local port binding.
+
+## 2026-04-16 — bridge continuity and Brain posture surfaced in white SETU
+- Freeze, mirror, recovery, and Brain posture are now visible on the bridge deck as read-only status.
+- Remaining gap: live HTTP route verification for the updated overview and observatory still needs an environment that permits local port binding.
+- Remaining gap: Brain posture currently comes from runtime inventory plus artifact state, not from a live provider execution path.
+
+## 2026-04-16 — white Setu verification-path hardening
+- Local build no longer depends on remote Google Fonts fetches.
+- `npm run build` now uses webpack because Turbopack hit a sandbox CSS worker permission failure here.
+- Remaining gap: live HTTP startup and browser route checks still need verification in an environment that permits local port binding.
+- Remaining gap: coding-flow durability is still split between shared checks and a route-level ledger follow-up; shared harness-ledger wiring is still pending.
+
+## 2026-04-16 — Dash 001 local-only brain enforcement
+- `local_only` coding-flow requests now hold when no live local brain lane is available instead of silently selecting a cloud tier.
+- Remaining gap: wire a real local brain lane or revise the privacy policy for routes that can safely use cloud tiers.
+
 ## 2026-04-15 — Dash 001 coding-flow outcome persistence
 - The intake POST path now writes a structured ledger event for the coding-flow preflight result.
 - Keep the current packet creation path and `303` redirect stable while broader bridge cleanup remains inventory-only.

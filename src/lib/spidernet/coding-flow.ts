@@ -103,6 +103,7 @@ export function runCodingFlow(input: CodingFlowInput): CodingFlowResult {
     permissionCheck.holdReason,
     policyCheck.holdReason,
     decisionValidation.holdReason,
+    brain.holdReason,
   ]);
 
   const finalized = finalizeHarnessVerification(

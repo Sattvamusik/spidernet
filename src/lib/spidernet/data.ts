@@ -1,4 +1,7 @@
-import type { DashboardSnapshot } from "./types";
+import fs from "fs";
+import path from "path";
+
+import type { BrainStatus, ContinuityStatus, DashboardSnapshot } from "./types";
 import { loadRuntimeStorage } from "./storage";
 
 type QuickStat = {
@@ -6,7 +9,136 @@ type QuickStat = {
   value: string;
 };
 
-function safePacket(packet: any, index: number) {
+const ARTIFACTS_ROOT = path.join(process.cwd(), "artifacts");
+const FREEZE_ROOT = path.join(ARTIFACTS_ROOT, "freeze");
+const MIRROR_ROOT = path.join(ARTIFACTS_ROOT, "mirror");
+const RECOVERY_ROOT = path.join(ARTIFACTS_ROOT, "recovery");
+const RUNTIME_INVENTORY_ROOT = path.join(ARTIFACTS_ROOT, "runtime/spidernet/inventory");
+
+function safeReadDir(dirPath: string) {
+  try {
+    return fs.readdirSync(dirPath, { withFileTypes: true });
+  } catch {
+    return [];
+  }
+}
+
+function safeReadFile(filePath: string) {
+  try {
+    return fs.readFileSync(filePath, "utf8");
+  } catch {
+    return "";
+  }
+}
+
+function countFilesRecursive(dirPath: string): number {
+  return safeReadDir(dirPath).reduce((count, entry) => {
+    const entryPath = path.join(dirPath, entry.name);
+    if (entry.isDirectory()) {
+      return count + countFilesRecursive(entryPath);
+    }
+    return entry.isFile() ? count + 1 : count;
+  }, 0);
+}
+
+function newestDirectoryName(dirPath: string): string | null {
+  const directories = safeReadDir(dirPath)
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => ({
+      name: entry.name,
+      mtimeMs: fs.statSync(path.join(dirPath, entry.name)).mtimeMs,
+    }))
+    .sort((a, b) => b.mtimeMs - a.mtimeMs);
+
+  return directories[0]?.name ?? null;
+}
+
+function buildContinuityStatus(): ContinuityStatus {
+  const freezeDirectories = safeReadDir(FREEZE_ROOT).filter((entry) => entry.isDirectory());
+  const verifiedFreezeDirectories = freezeDirectories
+    .map((entry) => ({
+      name: entry.name,
+      markerPath: path.join(FREEZE_ROOT, entry.name, "verified-freeze.txt"),
+    }))
+    .filter((entry) => fs.existsSync(entry.markerPath))
+    .map((entry) => ({
+      name: entry.name,
+      mtimeMs: fs.statSync(entry.markerPath).mtimeMs,
+    }))
+    .sort((a, b) => b.mtimeMs - a.mtimeMs);
+
+  const latestFreeze = verifiedFreezeDirectories[0]?.name ?? newestDirectoryName(FREEZE_ROOT);
+  const mirrorBuckets = safeReadDir(MIRROR_ROOT).filter((entry) => entry.isDirectory()).length;
+  const mirrorFiles = countFilesRecursive(MIRROR_ROOT);
+  const recoveryCheckpoints = countFilesRecursive(path.join(RECOVERY_ROOT, "checkpoints"));
+  const recoveryRestorePlans = countFilesRecursive(path.join(RECOVERY_ROOT, "restore-plans"));
+
+  return {
+    freeze:
+      verifiedFreezeDirectories.length > 0
+        ? {
+            status: "verified",
+            detail: `${verifiedFreezeDirectories.length} verified freeze checkpoints. Latest: ${latestFreeze}.`,
+          }
+        : latestFreeze
+          ? {
+              status: "captured",
+              detail: `${freezeDirectories.length} freeze directories exist. Latest checkpoint: ${latestFreeze}.`,
+            }
+          : {
+              status: "missing",
+              detail: "No freeze checkpoints are recorded yet.",
+            },
+    mirror:
+      mirrorFiles > 0
+        ? {
+            status: "ready",
+            detail: `${mirrorBuckets} mirror buckets with ${mirrorFiles} mirrored files are present.`,
+          }
+        : {
+            status: "empty",
+            detail: `${mirrorBuckets} mirror buckets exist, but no mirrored files are present yet.`,
+          },
+    recovery:
+      recoveryCheckpoints + recoveryRestorePlans > 0
+        ? {
+            status: "ready",
+            detail: `${recoveryCheckpoints} recovery checkpoints and ${recoveryRestorePlans} restore plans are available.`,
+          }
+        : {
+            status: "empty",
+            detail: "Recovery folders exist, but no checkpoints or restore plans are recorded yet.",
+          },
+  };
+}
+
+function buildBrainStatus(runtime: ReturnType<typeof loadRuntimeStorage>): BrainStatus {
+  const localLaneInventory = safeReadFile(path.join(RUNTIME_INVENTORY_ROOT, "local_coding_lane_inventory.md"));
+  const phaseInventory = safeReadFile(path.join(RUNTIME_INVENTORY_ROOT, "spidernet_phase1_inventory.md"));
+
+  const policyOnlyBrain = phaseInventory.includes("Brain manager is policy logic only");
+  const localLaneInventoried = localLaneInventory.includes("scripts/spidernet-local-code-start.sh");
+  const ollamaReachabilityInventoried = localLaneInventory.includes("Ollama endpoint reachable");
+  const noAutoFailover = phaseInventory.includes("does not switch live providers automatically");
+
+  return {
+    posture: policyOnlyBrain
+      ? "Brain selection is wired as policy logic, not as a live provider runtime."
+      : "Brain posture is not fully described in the current inventory.",
+    memorySignal: `${runtime.ledgerEvents.length} ledger events and ${runtime.vaultEntries.length} vault entries are available for bridge-deck context.`,
+    localLaneSignal: localLaneInventoried
+      ? ollamaReachabilityInventoried
+        ? "Local coding lane inventory lists repo-local helpers and Ollama reachability."
+        : "Local coding lane helpers are inventoried, but Ollama reachability is not confirmed in runtime data."
+      : "Local coding lane inventory is not present.",
+    ollamaSignal: `Ollama handshake is ${runtime.ollamaConfig.handshakeStatus} at ${runtime.ollamaConfig.endpoint}. ${runtime.ollamaConfig.note}`,
+    note: noAutoFailover
+      ? "Inventory still marks automatic failover as bridge logic, not final truth."
+      : "Treat this as runtime posture only, not proof of live multi-provider execution.",
+  };
+}
+
+function safePacket(packet: Record<string, unknown> | null | undefined, index: number) {
   const createdAt = typeof packet?.createdAt === "string" ? packet.createdAt : new Date(0).toISOString();
   return {
     packetId: typeof packet?.packetId === "string" ? packet.packetId : `intake-fallback-${index + 1}`,
@@ -64,6 +196,8 @@ function buildPolicyDecision(packet: ReturnType<typeof safePacket>) {
 
 export function getDashboardSnapshot(): DashboardSnapshot {
   const runtime = loadRuntimeStorage();
+  const continuityStatus = buildContinuityStatus();
+  const brainStatus = buildBrainStatus(runtime);
 
   const intakePackets = runtime.intakePackets.map(safePacket);
   const researchPackets = Array.isArray(runtime.researchPackets) ? runtime.researchPackets : [];
@@ -338,6 +472,8 @@ export function getDashboardSnapshot(): DashboardSnapshot {
 
     packets,
     policyDecisions,
+    brainStatus,
+    continuityStatus,
     packetTemplates,
     laneModel,
     routeFamilies,
@@ -363,8 +499,9 @@ export function getDashboardSnapshot(): DashboardSnapshot {
 
 export function getBoardQuickStats(
   snapshot: DashboardSnapshot = getDashboardSnapshot(),
-  _boardId?: string,
+  boardId?: string,
 ): QuickStat[] {
+  void boardId;
   return [
     { label: "Intake", value: String(snapshot.intakePackets.length) },
     { label: "Research", value: String(snapshot.researchPackets.length) },

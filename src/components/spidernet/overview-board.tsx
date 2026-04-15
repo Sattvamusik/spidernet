@@ -165,6 +165,27 @@ export function OverviewBoard({ boards, snapshot }: OverviewBoardProps) {
           </div>
         </div>
 
+        <div className="rounded-[30px] border border-white/90 bg-white/88 p-5 shadow-[0_16px_60px_rgba(15,23,42,0.08)]">
+          <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Bridge Continuity</p>
+          <div className="mt-4 space-y-3">
+            {[
+              ["Freeze", snapshot.continuityStatus.freeze.status, snapshot.continuityStatus.freeze.detail],
+              ["Mirror", snapshot.continuityStatus.mirror.status, snapshot.continuityStatus.mirror.detail],
+              ["Recovery", snapshot.continuityStatus.recovery.status, snapshot.continuityStatus.recovery.detail],
+            ].map(([label, status, detail]) => (
+              <div key={label} className="rounded-[22px] border border-slate-200 bg-slate-50 p-4">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-sm font-semibold text-slate-950">{label}</p>
+                  <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs text-slate-500">
+                    {status}
+                  </span>
+                </div>
+                <p className="mt-2 text-sm text-slate-600">{detail}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
         <div className="rounded-[30px] border border-cyan-200 bg-cyan-50/70 p-5 shadow-[0_16px_60px_rgba(15,23,42,0.06)]">
           <p className="text-xs uppercase tracking-[0.24em] text-cyan-700">Live Runtime</p>
           <div className="mt-4 space-y-3 text-sm text-slate-700">
