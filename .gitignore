@@ -46,3 +46,6 @@ artifacts/tmp/
 
 # local Claude settings
 .claude/settings.local.json
+
+# ts build cache
+tsconfig.tsbuildinfo
