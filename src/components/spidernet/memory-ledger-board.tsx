@@ -13,6 +13,7 @@ const persistenceFiles = [
   "artifacts/runtime/spidernet/packets/execution.json",
   "artifacts/runtime/spidernet/packets/validation.json",
   "artifacts/runtime/spidernet/packets/pass.json",
+  "artifacts/runtime/spidernet/config/ollama.json",
   "artifacts/runtime/spidernet/registries/wrappers.json",
   "artifacts/runtime/spidernet/registries/skills.json",
   "artifacts/runtime/spidernet/registries/scores.json",
@@ -115,6 +116,9 @@ export function MemoryLedgerBoard({ snapshot }: MemoryLedgerBoardProps) {
             </div>
             <div className="rounded-[22px] border border-cyan-100 bg-white/90 px-4 py-3">
               Ollama endpoint: {snapshot.ollamaConfig.endpoint} • model {snapshot.ollamaConfig.model} • {snapshot.ollamaConfig.handshakeStatus}
+            </div>
+            <div className="rounded-[22px] border border-cyan-100 bg-white/90 px-4 py-3">
+              Ollama note: {snapshot.ollamaConfig.note}
             </div>
           </div>
         </div>

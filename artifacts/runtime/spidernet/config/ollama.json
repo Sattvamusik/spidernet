@@ -1,0 +1,7 @@
+{
+  "endpoint": "http://127.0.0.1:11434",
+  "model": "",
+  "handshakeStatus": "prepared",
+  "lastCheckedAt": "",
+  "note": "Scaffold only. Live Ollama handshake is not verified in this repo run."
+}

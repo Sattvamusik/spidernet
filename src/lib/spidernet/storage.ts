@@ -9,6 +9,7 @@ export const RUNTIME_PATHS = {
   ledgerDir: path.join(BASE, "ledger"),
   registriesDir: path.join(BASE, "registries"),
   vaultsDir: path.join(BASE, "vaults"),
+  configDir: path.join(BASE, "config"),
 
   intakePackets: path.join(BASE, "packets/intake.json"),
   researchPackets: path.join(BASE, "packets/research.json"),
@@ -24,7 +25,8 @@ export const RUNTIME_PATHS = {
   ledgerEvents: path.join(BASE, "ledger/events.json"),
 
   vaultIndex: path.join(BASE, "vaults/index.json"),
-  ollamaConfig: path.join(BASE, "registries/ollama.json"),
+  ollamaConfig: path.join(BASE, "config/ollama.json"),
+  legacyOllamaConfig: path.join(BASE, "registries/ollama.json"),
 } as const;
 
 type JsonValue = unknown;
@@ -53,6 +55,10 @@ function ensureRecord(value: JsonValue): Record<string, unknown> {
     return value as Record<string, unknown>;
   }
   return {};
+}
+
+function hasOwnData(value: Record<string, unknown>) {
+  return Object.keys(value).length > 0;
 }
 
 function writeJsonFile(filePath: string, value: JsonValue) {
@@ -111,13 +117,82 @@ export type RuntimeStorage = {
   ollamaConfig: {
     handshakeStatus: string;
     endpoint: string;
-    lastCheckedAt: string | null;
+    model: string;
+    lastCheckedAt: string;
+    note: string;
   };
 };
 
+function normalizeOllamaConfig(
+  config: Record<string, unknown>,
+  options?: {
+    source: "config" | "legacy";
+    fallbackUsed?: boolean;
+  },
+) {
+  const source = options?.source ?? "config";
+  const fallbackUsed = options?.fallbackUsed ?? false;
+  const handshakeStatus =
+    config.handshakeStatus === "prepared" ||
+    config.handshakeStatus === "ready" ||
+    config.handshakeStatus === "missing"
+      ? config.handshakeStatus
+      : "missing";
+  const endpoint =
+    typeof config.endpoint === "string" && config.endpoint.trim().length > 0
+      ? config.endpoint
+      : typeof config.baseUrl === "string" && config.baseUrl.trim().length > 0
+        ? config.baseUrl
+        : "http://127.0.0.1:11434";
+  const model = typeof config.model === "string" ? config.model : "";
+  const lastCheckedAt = typeof config.lastCheckedAt === "string" ? config.lastCheckedAt : "";
+  const legacyNote =
+    source === "legacy"
+      ? "Loaded from legacy registry fallback because the documented config file is missing."
+      : "Stored at the documented config path for white Setu runtime posture.";
+  const scaffoldNote =
+    "Scaffold only. Live Ollama handshake is not verified in this repo run.";
+
+  return {
+    handshakeStatus,
+    endpoint,
+    model,
+    lastCheckedAt,
+    note:
+      typeof config.note === "string" && config.note.trim().length > 0
+        ? config.note
+        : fallbackUsed
+          ? `${legacyNote} ${scaffoldNote}`
+          : legacyNote,
+  };
+}
+
+function loadOllamaConfigRecord() {
+  const configRecord = ensureRecord(readJsonFile<Record<string, unknown>>(RUNTIME_PATHS.ollamaConfig, {}));
+  if (hasOwnData(configRecord)) {
+    return normalizeOllamaConfig(configRecord, { source: "config" });
+  }
+
+  const legacyRecord = ensureRecord(readJsonFile<Record<string, unknown>>(RUNTIME_PATHS.legacyOllamaConfig, {}));
+  if (hasOwnData(legacyRecord)) {
+    return normalizeOllamaConfig(legacyRecord, { source: "legacy", fallbackUsed: true });
+  }
+
+  return normalizeOllamaConfig(
+    {
+      endpoint: "http://127.0.0.1:11434",
+      model: "",
+      handshakeStatus: "missing",
+      lastCheckedAt: "",
+      note: "No Ollama runtime config file is recorded yet. Scaffold only until the documented config file exists.",
+    },
+    { source: "config" },
+  );
+}
+
 export function loadRuntimeStorage(): RuntimeStorage {
   const vaultIndex = ensureRecord(readJsonFile<Record<string, unknown>>(RUNTIME_PATHS.vaultIndex, {}));
-  const ollamaConfig = ensureRecord(readJsonFile<Record<string, unknown>>(RUNTIME_PATHS.ollamaConfig, {}));
+  const ollamaConfig = loadOllamaConfigRecord();
 
   return {
     intakePackets: ensureArray<IntakePacketRecord>(readJsonFile<IntakePacketRecord[]>(RUNTIME_PATHS.intakePackets, [])),
@@ -133,12 +208,7 @@ export function loadRuntimeStorage(): RuntimeStorage {
 
     ledgerEvents: ensureArray<LedgerEventRecord>(readJsonFile<LedgerEventRecord[]>(RUNTIME_PATHS.ledgerEvents, [])),
     vaultEntries: Object.values(vaultIndex) as Record<string, unknown>[],
-    ollamaConfig: {
-      handshakeStatus: typeof ollamaConfig.handshakeStatus === "string" ? ollamaConfig.handshakeStatus : "prepared",
-      endpoint: typeof ollamaConfig.endpoint === "string" ? ollamaConfig.endpoint : "http://127.0.0.1:11434",
-      lastCheckedAt:
-        typeof ollamaConfig.lastCheckedAt === "string" ? ollamaConfig.lastCheckedAt : null,
-    },
+    ollamaConfig,
   };
 }
 
