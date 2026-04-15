@@ -1,0 +1,40 @@
+You are working in the SpiderNet / Setu repo.
+
+Mission:
+Build the first governed foundation for Setu Brain, Saarthi manager, Hanuman ji agent registry, and the living architecture map.
+
+Rules:
+- Setu is the bridge deck.
+- Saarthi is the manager.
+- Hanuman ji is head of all agents.
+- Input Data is the main intake point.
+- Preserve the white Setu UI unless explicitly asked to redesign.
+- Do not touch unrelated files.
+- Separate inferred from verified.
+- Never claim verified unless checks actually pass.
+- Keep logs useful and product-relevant.
+- Freeze and mirroring matter.
+- Build under SpiderNet law.
+
+Primary deliverables for this run:
+1. Create file-backed Brain scaffolding under src/lib/spidernet/brain/
+2. Create specialist registry scaffolding
+3. Create project manifest scaffolding
+4. Create FTD / mission-state scaffolding
+5. Create living architecture map scaffolding if missing
+6. Keep changes minimal, typed, and repo-aligned
+
+After changes, run:
+- npm run build
+- ./scripts/spidernet-coding-launcher.sh status || true
+- ./scripts/spidernet-coding-launcher.sh check || true
+
+If port 3000 is serving:
+- curl -I http://127.0.0.1:3000/
+- curl -I http://127.0.0.1:3000/boards/input-data
+
+Report:
+- what was changed
+- what passed
+- what failed
+- what remains

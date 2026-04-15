@@ -1,0 +1,18 @@
+You are working in the SpiderNet / Setu repo.
+
+Mission:
+Make Setu easier to use as an app-like desktop control surface, not only in browser tabs.
+
+Goals:
+- preserve existing app behavior
+- improve launcher / desktop usage
+- keep UI identity intact
+- do not redesign unless necessary
+
+Tasks:
+- inspect existing scripts and desktop launchers
+- tighten the launcher pathing if needed
+- keep favicon / desktop icon usage coherent
+- do not touch unrelated files
+
+Run relevant checks and report only what actually passed.
