@@ -2,11 +2,11 @@
  M .handoff/04-verify.txt
  M .handoff/05-repo-facts.txt
  M .handoff/06-diff-summary.txt
- M .handoff/manifest.json
  M next-env.d.ts
  M tsconfig.tsbuildinfo
 
 === latest commits ===
+a775e4c Handoff: refresh after <milestone>
 95cb176 Handoff: update after observatory compatibility cleanup
 850aa60 Brain v1: remove redundant legacy posture row from observatory
 7f15a09 Handoff: add thread transfer bundle system
@@ -14,4 +14,3 @@
 e5e735f Brain v1: expose file-backed posture in dashboard snapshot
 e8408ee Brain v1: read-only file-backed posture scaffold (Option B)
 7afc9dc Apr 16: ignore TypeScript build cache
-6f71612 Apr 16: Claude governance, mission scaffold, and recovery helpers
