@@ -1,3 +1,5 @@
+import type { BrainPostureSnapshot } from "./brain/types";
+
 export type BoardId =
   | "dash-001-input-data"
   | "dash-002-tools-store"
@@ -381,6 +383,7 @@ export type DashboardSnapshot = {
   policyDecisions: RoutingDecision[];
   managerSynthesis: ManagerSynthesis;
   brainStatus: BrainStatus;
+  brainPosture?: BrainPostureSnapshot;
   continuityStatus: ContinuityStatus;
   readinessGates: ReadinessGate[];
   researchTools: ResearchToolProfile[];

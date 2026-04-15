@@ -3,6 +3,7 @@ import path from "path";
 
 import type { BrainStatus, ContinuityStatus, DashboardSnapshot } from "./types";
 import { loadRuntimeStorage } from "./storage";
+import { loadPosture } from "./brain/posture";
 
 type QuickStat = {
   label: string;
@@ -198,6 +199,7 @@ export function getDashboardSnapshot(): DashboardSnapshot {
   const runtime = loadRuntimeStorage();
   const continuityStatus = buildContinuityStatus();
   const brainStatus = buildBrainStatus(runtime);
+  const brainPosture = loadPosture();
 
   const intakePackets = runtime.intakePackets.map(safePacket);
   const researchPackets = Array.isArray(runtime.researchPackets) ? runtime.researchPackets : [];
@@ -473,6 +475,7 @@ export function getDashboardSnapshot(): DashboardSnapshot {
     packets,
     policyDecisions,
     brainStatus,
+    brainPosture,
     continuityStatus,
     packetTemplates,
     laneModel,
