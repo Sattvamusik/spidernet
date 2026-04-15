@@ -1,5 +1,9 @@
 # FTD — Future To Do
 
+## 2026-04-15 — Dash 001 coding-flow outcome persistence
+- The intake POST path now writes a structured ledger event for the coding-flow preflight result.
+- Keep the current packet creation path and `303` redirect stable while broader bridge cleanup remains inventory-only.
+
 ## High priority
 - add live packet mutation flows if Dash 001 through Dash 005 need in-app editing rather than read-only runtime display
 - add a dedicated smoke or test script to `package.json`

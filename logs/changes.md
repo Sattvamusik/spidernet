@@ -1,5 +1,11 @@
 # Changes
 
+## 2026-04-15 — Dash 001 coding-flow outcome persistence
+- added one append-only ledger event in the Dash 001 intake POST route so the coding-flow preflight result is stored as a structured local record
+- kept the intake packet creation path intact
+- preserved the POST `/api/spidernet/intake` `303` redirect behavior
+- left the white SETU UI unchanged
+
 ## 2026-04-14 — white web dashboard architecture alignment
 - kept the white web dashboard as the only product family and did not import the Tk visual styling
 - updated shared types and architecture registry to make board names, short labels, exposure ladder, route model, and snapshot data explicit
@@ -58,7 +64,7 @@
 
 ## 2026-04-15 — Dash 001 intake flow wiring and launcher cleanup
 - wired `src/lib/spidernet/coding-flow.ts` into the Dash 001 intake POST route as a non-blocking preflight step
-- updated `scripts/spidernet-coding-launcher.sh` to resolve the repo root dynamically and prefer `.venv-tools/bin/aider`
+- updated `scripts/spidernet-coding-launcher.sh` to resolve the repo root dynamically and prefer/report `.venv-tools/bin/aider`
 - replaced the stale launcher `npm run intake:check` target with `scripts/spidernet-phase1-check.sh`
 - verified targeted ESLint on the touched TypeScript files passed
 - build remained blocked by Google Fonts fetches in the sandboxed environment

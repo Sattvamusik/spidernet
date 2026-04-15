@@ -40,5 +40,12 @@
     "packetId": "intake-2026-04-15T09-28-09-267Z-abb97152",
     "detail": "Dash 001 wrote a new intake packet and appended a ledger event.",
     "createdAt": "2026-04-15T09:28:09.267Z"
+  },
+  {
+    "eventId": "evt-5be33ccb-c41",
+    "type": "intake_packet_created",
+    "packetId": "intake-2026-04-15T12-35-05-197Z-20d09571",
+    "detail": "Dash 001 wrote a new intake packet and appended a ledger event.",
+    "createdAt": "2026-04-15T12:35:05.197Z"
   }
 ]

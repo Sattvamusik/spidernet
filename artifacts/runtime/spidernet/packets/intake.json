@@ -130,5 +130,27 @@
     "status": "captured",
     "createdAt": "2026-04-15T09:28:09.267Z",
     "source": "white-web-setu"
+  },
+  {
+    "packetId": "intake-2026-04-15T12-35-05-197Z-20d09571",
+    "objective": "Dash 001 intake packet created from the white SETU UI.",
+    "classifications": [
+      "dash-001",
+      "manual-trigger",
+      "safe-default"
+    ],
+    "routes": [
+      "/boards/input-data"
+    ],
+    "vaultTargets": [
+      "/boards/memory-ledger"
+    ],
+    "intakeModes": [
+      "ui-trigger"
+    ],
+    "attachments": [],
+    "status": "captured",
+    "createdAt": "2026-04-15T12:35:05.197Z",
+    "source": "white-web-setu"
   }
 ]

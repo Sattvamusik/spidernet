@@ -1,5 +1,23 @@
 # Worklog
 
+## 2026-04-15 — Dash 001 coding-flow outcome ledger follow-up
+### Done
+- Added one append-only ledger event in `src/app/api/spidernet/intake/route.ts` so the Dash 001 coding-flow preflight result is persisted alongside the intake packet.
+- Kept the POST `/api/spidernet/intake` redirect behavior unchanged with the existing `303` response.
+- Kept the intake packet creation path alive and left the white SETU UI unchanged.
+
+### Verified
+- Pending local validation for this follow-up patch.
+
+### Active
+- Dash 001 intake still uses the live packet and ledger persistence path.
+
+### Remaining
+- Confirm the follow-up patch with build and HTTP smoke checks.
+
+### Risks / blockers
+- None beyond the existing environment constraints for validation.
+
 ## 2026-04-14 — white web dashboard alignment and architecture import
 ### Done
 - Kept the current white web dashboard family as the only UI direction and did not port the dark Tk desktop styling.
@@ -166,7 +184,7 @@
 ### Done
 - Wired `src/lib/spidernet/coding-flow.ts` into the Dash 001 intake POST path as a non-blocking preflight check.
 - Updated `scripts/spidernet-coding-launcher.sh` to resolve the repo root dynamically.
-- Updated `scripts/spidernet-coding-launcher.sh` to prefer `.venv-tools/bin/aider` when present.
+- Updated `scripts/spidernet-coding-launcher.sh` to prefer `.venv-tools/bin/aider` when present and to report it in status output.
 - Replaced the stale launcher `intake-check` command target with the existing phase 1 check script.
 
 ### Verified
