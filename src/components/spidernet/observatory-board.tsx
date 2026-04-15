@@ -106,6 +106,23 @@ export function ObservatoryBoard({ snapshot }: ObservatoryBoardProps) {
             <div className="rounded-[22px] border border-cyan-100 bg-white/90 px-4 py-3">
               Guardrail: {snapshot.brainStatus.note}
             </div>
+            {snapshot.brainPosture ? (
+              <div className="rounded-[22px] border border-cyan-100 bg-white/90 px-4 py-3">
+                <p className="text-[11px] uppercase tracking-[0.18em] text-cyan-700">
+                  Tier posture (file-backed)
+                </p>
+                <div className="mt-2 space-y-1 text-xs text-slate-600">
+                  {snapshot.brainPosture.tiers.map((tier) => (
+                    <div key={tier.tier} className="flex items-center justify-between gap-3">
+                      <span className="font-mono text-slate-700">{tier.tier}</span>
+                      <span className="rounded-full border border-cyan-200 bg-cyan-50 px-2 py-0.5">
+                        {tier.status}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : null}
           </div>
         </div>
       </section>
