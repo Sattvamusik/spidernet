@@ -4,14 +4,13 @@
  M .handoff/06-diff-summary.txt
  M next-env.d.ts
  M tsconfig.tsbuildinfo
-?? src/lib/spidernet/brain/events.ts
 
 === latest commits ===
+1bf8a8b Brain v2: add posture change ledger emitter
+23023ea Handoff: refresh after Brain Phase 2b ledger emitter
 4538d75 Handoff: refresh after Brain Phase 2a write primitive
 ca9cf46 Brain v2: add atomic posture write primitive
 4b76313 Handoff: refresh after Brain write-path design
 67574f8 Architecture: define Brain write-path and ledger design
 dae2f19 Handoff: refresh to accurate state
 a775e4c Handoff: refresh after <milestone>
-95cb176 Handoff: update after observatory compatibility cleanup
-850aa60 Brain v1: remove redundant legacy posture row from observatory
