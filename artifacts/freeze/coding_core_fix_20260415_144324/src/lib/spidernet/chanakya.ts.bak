@@ -1,0 +1,61 @@
+export type ChanakyaAuthorityInput = {
+  actor: string;
+  stage: string;
+  route?: string | null;
+  requestedAction?: string | null;
+  allowedActors?: string[];
+  allowedRoutes?: string[];
+};
+
+export type ChanakyaAuthorityResult = {
+  ok: boolean;
+  reasons: string[];
+  holdReason: string | null;
+};
+
+function hasText(value: unknown): boolean {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
+function cleanArray(value: unknown): string[] {
+  return Array.isArray(value) ? value.filter((item): item is string => typeof item === "string" && item.trim().length > 0) : [];
+}
+
+export function checkPermissions(input: ChanakyaAuthorityInput): ChanakyaAuthorityResult {
+  const reasons: string[] = [];
+  const allowedActors = cleanArray(input.allowedActors);
+
+  if (!hasText(input.actor)) {
+    reasons.push("Missing actor.");
+  } else if (allowedActors.length > 0 && !allowedActors.includes(input.actor)) {
+    reasons.push(`Actor '${input.actor}' is not permitted.`);
+  }
+
+  if (!hasText(input.requestedAction)) {
+    reasons.push("Missing requested action.");
+  }
+
+  return {
+    ok: reasons.length === 0,
+    reasons,
+    holdReason: reasons.length > 0 ? reasons[0] : null,
+  };
+}
+
+export function checkPolicyAuthority(input: ChanakyaAuthorityInput): ChanakyaAuthorityResult {
+  const reasons: string[] = [];
+  const allowedRoutes = cleanArray(input.allowedRoutes);
+
+  if (!hasText(input.stage)) reasons.push("Missing stage.");
+  if (!hasText(input.route)) {
+    reasons.push("Missing route.");
+  } else if (allowedRoutes.length > 0 && !allowedRoutes.includes(input.route)) {
+    reasons.push(`Route '${input.route}' is not allowed.`);
+  }
+
+  return {
+    ok: reasons.length === 0,
+    reasons,
+    holdReason: reasons.length > 0 ? reasons[0] : null,
+  };
+}

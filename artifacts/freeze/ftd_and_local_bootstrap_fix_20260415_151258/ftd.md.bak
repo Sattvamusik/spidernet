@@ -1,0 +1,48 @@
+# FTD — Future To Do
+
+## High priority
+- add live packet mutation flows if Dash 001 through Dash 005 need in-app editing rather than read-only runtime display
+- add a dedicated smoke or test script to `package.json`
+- add authenticated action handling for approvals and decision queue updates
+- decide whether browser automation should become a live wrapper path
+- decide whether desktop automation should remain manual hold in the web-first product
+
+## Medium priority
+- connect approval and execution packet mutation to real UI actions
+- add screenshots of the updated white dashboard to `artifacts/`
+- add route-level API handlers for runtime writes and refresh
+- capture UI screenshots in `artifacts/screenshots`
+- wire a real Ollama handshake after local endpoint confirmation
+
+## Later
+- add auth model and role-aware access control
+- add CI validation and deployment runbook
+
+## Blocked
+- no dedicated automated test script is defined yet
+
+## 2026-04-14 — Deferred North-Star Targets
+
+[RESEARCH] Keep as future-state targets, not mandatory for every immediate phase:
+- Kubernetes orchestration
+- Service mesh
+- RabbitMQ / Kafka
+- CQRS / Saga / DDD / microservices split
+- SOC2 / HIPAA / GDPR formal compliance tracks
+- 10K+ req/sec throughput target
+- 99.99% SLA target
+- quarterly penetration testing program
+- full blue-green / canary deployment automation
+- complete IaC stack
+- advanced chaos engineering
+- mutation testing at scale
+- sharding / replication / CDN / edge patterns
+- active-active failover patterns
+
+Reason:
+These are strong long-term standards and should remain in SpiderNet direction, but forcing them as immediate universal hard requirements on every small build phase can create fake compliance theater, unnecessary complexity, and blocked progress.
+
+Rule:
+- Keep them visible
+- Keep them tracked
+- Pull them forward when project maturity justifies them

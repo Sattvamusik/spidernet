@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=SpiderNet Dashboard
+Comment=Open SpiderNet Dashboard
+Exec=/home/sattv/projects/spidernet-control-deck/scripts/open_spidernet_dashboard.sh
+Icon=/home/sattv/projects/spidernet-control-deck/assets/icons/spidernet-dashboard.svg
+Terminal=false
+Categories=Development;
+StartupNotify=true

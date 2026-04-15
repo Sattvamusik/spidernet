@@ -1,0 +1,760 @@
+=== SETU CONTRACT AUDIT ===
+Wed Apr 15 12:48:14 IST 2026
+
+ROOT=/home/sattv/projects/spidernet-control-deck
+
+=== GIT STATUS ===
+ M README.md
+ M docs/architecture.md
+ M docs/runbook.md
+ M docs/setup.md
+ M docs/spidernet-operating-rules.md
+ M docs/troubleshooting.md
+ M logs/changes.md
+ M logs/worklog.md
+ M package-lock.json
+ M plans/ftd.md
+ M src/app/globals.css
+ M src/app/layout.tsx
+ M src/app/page.tsx
+?? artifacts/freeze/
+?? artifacts/runtime/
+?? assets/
+?? blp/
+?? dna/
+?? docs/dashboard_finish_note.txt
+?? lib/
+?? prompts/
+?? public/favicon.svg
+?? public/spidernet-dashboard.svg
+?? rul/
+?? scripts/SpiderNet-Dashboard.desktop
+?? scripts/build_or_repair_spidernet_dashboard.sh
+?? scripts/open_spidernet_dashboard.sh
+?? scripts/reset_runtime_and_run.sh
+?? scripts/run_codex_finish.sh
+?? src/app/api/
+?? src/app/boards/
+?? src/components/
+?? src/lib/
+
+=== FILE: src/lib/spidernet/data.ts ===
+import { loadRuntimeStorage } from "./storage";
+
+type QuickStat = {
+  label: string;
+  value: string;
+};
+
+type SnapshotRecord = Record<string, any>;
+
+function safeArray(value: any) {
+  return Array.isArray(value) ? value : [];
+}
+
+function withArrayFallbacks(base: SnapshotRecord): SnapshotRecord {
+  return new Proxy(base, {
+    get(target, prop: string | symbol) {
+      if (typeof prop !== "string") return (target as any)[prop];
+      if (prop in target) return target[prop];
+      return [];
+    },
+  });
+}
+
+export function getDashboardSnapshot() {
+  const runtime = loadRuntimeStorage();
+
+  const intakePackets = safeArray(runtime.intakePackets);
+  const researchPackets = safeArray(runtime.researchPackets);
+  const executionPackets = safeArray(runtime.executionPackets);
+  const validationPackets = safeArray(runtime.validationPackets);
+  const approvalPackets = safeArray(runtime.approvalPackets);
+  const passPackets = safeArray(runtime.passPackets);
+
+  const wrapperRegistry = safeArray(runtime.wrapperRegistry);
+  const skillRegistry = safeArray(runtime.skillRegistry);
+  const scoreRegistry = safeArray(runtime.scoreRegistry);
+  const ledgerEvents = safeArray(runtime.ledgerEvents);
+  const vaultEntries = safeArray(runtime.vaultEntries);
+
+  return withArrayFallbacks({
+    intakePackets,
+    researchPackets,
+    executionPackets,
+    validationPackets,
+    approvalPackets,
+    passPackets,
+    wrapperRegistry,
+    skillRegistry,
+    scoreRegistry,
+    ledgerEvents,
+    vaultEntries,
+
+    laneModel: [
+      { name: "Intake", description: "Incoming requests and raw packets.", count: intakePackets.length },
+      { name: "Research", description: "Research tasks and evidence gathering.", count: researchPackets.length },
+      { name: "Execution", description: "Build and execution work in progress.", count: executionPackets.length },
+      { name: "Validation", description: "Checks, tests, and verification tasks.", count: validationPackets.length },
+      { name: "Approval", description: "Approval and review queue.", count: approvalPackets.length },
+      { name: "Pass", description: "Completed and accepted work.", count: passPackets.length },
+    ],
+
+    routeFamilies: [
+      { route: "/boards/input-data", title: "Input Data", description: "Intake, triage, and packet entry.", count: intakePackets.length },
+      { route: "/boards/tools-store", title: "Tools Store", description: "Tool inventory and research helpers.", count: wrapperRegistry.length },
+      { route: "/boards/hive-agents", title: "Hive Agents", description: "Execution, oversight, and agent coordination.", count: executionPackets.length + approvalPackets.length },
+      { route: "/boards/observatory", title: "Observatory", description: "Signals, ledger activity, and runtime visibility.", count: ledgerEvents.length },
+      { route: "/boards/memory-ledger", title: "Memory & Ledger", description: "Stored memory, vault entries, and persistent records.", count: vaultEntries.length },
+    ],
+
+    exposureDecisionLadder: [
+      { key: "intake", title: "Intake", detail: "Capture and normalize incoming work.", status: intakePackets.length > 0 ? "active" : "idle" },
+      { key: "research", title: "Research", detail: "Collect evidence and context before execution.", status: researchPackets.length > 0 ? "active" : "idle" },
+      { key: "execution", title: "Execution", detail: "Perform implementation and changes.", status: executionPackets.length > 0 ? "active" : "idle" },
+      { key: "validation", title: "Validation", detail: "Verify work and inspect outcomes.", status: validationPackets.length > 0 ? "active" : "idle" },
+      { key: "approval", title: "Approval", detail: "Route completed work for decision and sign-off.", status: approvalPackets.length > 0 ? "active" : "idle" },
+      { key: "memory", title: "Memory", detail: "Persist outcomes into ledger and vault.", status: ledgerEvents.length > 0 || vaultEntries.length > 0 ? "active" : "idle" },
+    ],
+
+    registryCatalog: [
+      { name: "Wrappers", purpose: "Tool and execution wrapper inventory.", count: wrapperRegistry.length },
+      { name: "Skills", purpose: "Registered skill and capability memory.", count: skillRegistry.length },
+      { name: "Scores", purpose: "Tool score memory and evaluation records.", count: scoreRegistry.length },
+      { name: "Ledger", purpose: "Append-only event history.", count: ledgerEvents.length },
+      { name: "Vault", purpose: "Persisted vault entries and memory records.", count: vaultEntries.length },
+    ],
+  });
+}
+
+export function getBoardQuickStats(): QuickStat[] {
+  const runtime = loadRuntimeStorage();
+
+  const intakePackets = safeArray(runtime.intakePackets);
+  const researchPackets = safeArray(runtime.researchPackets);
+  const executionPackets = safeArray(runtime.executionPackets);
+  const validationPackets = safeArray(runtime.validationPackets);
+  const approvalPackets = safeArray(runtime.approvalPackets);
+  const passPackets = safeArray(runtime.passPackets);
+  const wrapperRegistry = safeArray(runtime.wrapperRegistry);
+  const ledgerEvents = safeArray(runtime.ledgerEvents);
+
+  return [
+    { label: "Intake", value: String(intakePackets.length) },
+    { label: "Research", value: String(researchPackets.length) },
+    { label: "Execution", value: String(executionPackets.length) },
+    { label: "Validation", value: String(validationPackets.length) },
+    { label: "Approval", value: String(approvalPackets.length) },
+    { label: "Pass", value: String(passPackets.length) },
+    { label: "Wrappers", value: String(wrapperRegistry.length) },
+    { label: "Ledger", value: String(ledgerEvents.length) },
+  ];
+}
+
+=== FILE: src/lib/spidernet/storage.ts ===
+import fs from "fs";
+import path from "path";
+
+const BASE = path.join(process.cwd(), "artifacts/runtime/spidernet");
+
+function read(file: string, fallback: any) {
+  try {
+    if (!fs.existsSync(file)) return fallback;
+    const raw = fs.readFileSync(file, "utf8").trim();
+    if (!raw) return fallback;
+    return JSON.parse(raw);
+  } catch {
+    return fallback;
+  }
+}
+
+function ensureArray(v: any) {
+  return Array.isArray(v) ? v : [];
+}
+
+export function loadRuntimeStorage() {
+  return {
+    intakePackets: ensureArray(read(`${BASE}/packets/intake.json`, [])),
+    researchPackets: ensureArray(read(`${BASE}/packets/research.json`, [])),
+    executionPackets: ensureArray(read(`${BASE}/packets/execution.json`, [])),
+    validationPackets: ensureArray(read(`${BASE}/packets/validation.json`, [])),
+    approvalPackets: ensureArray(read(`${BASE}/packets/approval.json`, [])),
+    passPackets: ensureArray(read(`${BASE}/packets/pass.json`, [])),
+
+    wrapperRegistry: ensureArray(read(`${BASE}/registries/wrappers.json`, [])),
+    skillRegistry: ensureArray(read(`${BASE}/registries/skills.json`, [])),
+    scoreRegistry: ensureArray(read(`${BASE}/registries/scores.json`, [])),
+
+    ledgerEvents: ensureArray(read(`${BASE}/ledger/events.json`, [])),
+
+    vaultEntries: Object.values(read(`${BASE}/vaults/index.json`, {}))
+  };
+}
+
+=== FILE: src/app/page.tsx ===
+import { DashboardShell } from "@/components/spidernet/shell";
+import { OverviewBoard } from "@/components/spidernet/overview-board";
+import { getDashboardSnapshot, getBoardQuickStats } from "@/lib/spidernet/data";
+import { boardRegistry } from "@/lib/spidernet/registry";
+
+export default async function Home() {
+  const snapshot = await getDashboardSnapshot();
+
+  return (
+    <DashboardShell
+      activePath="/"
+      eyebrow="SpiderNet Control Deck"
+      title="White web SETU operating surface"
+      description="The current white dashboard remains the main product direction. It now carries the DRISHTI Phase 5 operating model: six locked boards, four lanes, typed packets, policy-before-routing, vault routing, registry-driven execution, durable local storage, and explicit live-versus-prepared tool exposure."
+      quickStats={getBoardQuickStats(snapshot)}
+    >
+      <OverviewBoard boards={boardRegistry} snapshot={snapshot} />
+    </DashboardShell>
+  );
+}
+
+=== FILE: src/components/spidernet/overview-board.tsx ===
+import Link from "next/link";
+
+import { AppIcon } from "@/components/spidernet/icons";
+import { getVisibleBoards, getWidgetsForBoard } from "@/lib/spidernet/router";
+import type { BoardDefinition, DashboardSnapshot } from "@/lib/spidernet/types";
+
+type OverviewBoardProps = {
+  boards: BoardDefinition[];
+  snapshot: DashboardSnapshot;
+};
+
+const starterSteps = [
+  "Start in Dash 001 to capture the task as an intake packet.",
+  "Use Dash 002 only to compare tools and choose a safe exposure path.",
+  "Let Saarthi in Dash 003 decide routing, approvals, and readiness.",
+  "Execute through Dash 004, verify in Dash 005, and preserve history in Dash 006.",
+];
+
+export function OverviewBoard({ boards, snapshot }: OverviewBoardProps) {
+  const mainBoards = getVisibleBoards("main");
+
+  return (
+    <div className="grid gap-4 xl:grid-cols-[minmax(0,1.4fr)_380px]">
+      <section className="space-y-4">
+        <div className="rounded-[30px] border border-white/90 bg-white/88 p-5 shadow-[0_16px_60px_rgba(15,23,42,0.08)]">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Main Product Direction</p>
+              <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
+                White web SETU is the product. DRISHTI desktop is architecture reference only.
+              </h2>
+              <p className="mt-3 max-w-4xl text-sm leading-7 text-slate-600">
+                This dashboard carries over the operating model, packet flow, registries, and readiness law from the desktop line without importing the dark Tk visual family.
+              </p>
+            </div>
+            <div className="rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+              {boards.length} locked board definitions
+            </div>
+          </div>
+
+          <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+            {starterSteps.map((step, index) => (
+              <div key={step} className="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
+                <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Step {index + 1}</p>
+                <p className="mt-2 text-sm leading-6 text-slate-700">{step}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="rounded-[30px] border border-white/90 bg-white/88 p-5 shadow-[0_16px_60px_rgba(15,23,42,0.08)]">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Locked Six-Board Purpose Model</p>
+              <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">
+                One family, six fixed jobs
+              </h2>
+            </div>
+            <div className="rounded-full bg-cyan-50 px-3 py-1.5 text-sm font-medium text-cyan-700">
+              novice-first shell
+            </div>
+          </div>
+
+          <div className="mt-5 grid gap-4 lg:grid-cols-2">
+            {mainBoards.map((board) => (
+              <Link
+                key={board.id}
+                href={board.route}
+                className="group rounded-[26px] border border-slate-200 bg-slate-50 p-4 transition hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="rounded-2xl bg-slate-950 p-3 text-white">
+                    <AppIcon name={board.icon} />
+                  </div>
+                  <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs text-slate-500">
+                    {board.purposeLock}
+                  </span>
+                </div>
+                <p className="mt-4 text-xs uppercase tracking-[0.22em] text-slate-500">{board.code}</p>
+                <h3 className="mt-2 text-xl font-semibold tracking-tight text-slate-950">
+                  {board.shortTitle}
+                </h3>
+                <p className="mt-2 text-sm leading-6 text-slate-600">{board.shellSummary}</p>
+                <div className="mt-4 flex flex-wrap gap-2 text-xs text-slate-500">
+                  {getWidgetsForBoard(board.id).map((widget) => (
+                    <span key={widget.id} className="rounded-full border border-slate-200 bg-white px-2.5 py-1">
+                      {widget.title}
+                    </span>
+                  ))}
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+          <div className="rounded-[30px] border border-white/90 bg-white/88 p-5 shadow-[0_16px_60px_rgba(15,23,42,0.08)]">
+            <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Four-Lane Model</p>
+            <div className="mt-4 space-y-3">
+              {snapshot.laneModel.map((lane) => (
+                <div key={lane.name} className="rounded-[22px] border border-slate-200 bg-slate-50 p-4">
+                  <p className="text-sm font-semibold text-slate-950">{lane.name}</p>
+                  <p className="mt-1 text-sm text-slate-600">{lane.mandate}</p>
+                  <p className="mt-2 text-xs uppercase tracking-[0.18em] text-slate-500">
+                    {lane.primaryOutputs}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-[30px] border border-white/90 bg-white/88 p-5 shadow-[0_16px_60px_rgba(15,23,42,0.08)]">
+            <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Vault Routing Model</p>
+            <div className="mt-4 space-y-3">
+              {snapshot.routeFamilies.map((route) => (
+                <div key={route.route} className="rounded-[22px] border border-slate-200 bg-slate-50 p-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-sm font-semibold text-slate-950">{route.route}</p>
+                    <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs text-slate-500">
+                      {route.owner}
+                    </span>
+                  </div>
+                  <p className="mt-2 text-sm text-slate-600">{route.purpose}</p>
+                  <p className="mt-2 text-xs leading-5 text-slate-500">{route.trigger}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="grid gap-4">
+        <div className="rounded-[30px] border border-white/90 bg-white/88 p-5 shadow-[0_16px_60px_rgba(15,23,42,0.08)]">
+          <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Software Exposure Decision Ladder</p>
+          <div className="mt-4 space-y-3">
+            {snapshot.exposureDecisionLadder.map((step, index) => (
+              <div key={step.key} className="rounded-[22px] border border-slate-200 bg-slate-50 p-4">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-sm font-semibold text-slate-950">
+                    {index + 1}. {step.label}
+                  </p>
+                  <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs text-slate-500">
+                    {step.status}
+                  </span>
+                </div>
+                <p className="mt-2 text-sm text-slate-600">{step.description}</p>
+                <p className="mt-2 text-xs text-slate-500">Best for: {step.idealFor}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="rounded-[30px] border border-white/90 bg-white/88 p-5 shadow-[0_16px_60px_rgba(15,23,42,0.08)]">
+          <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Registry-Driven Runtime</p>
+          <div className="mt-4 space-y-3">
+            {snapshot.registryCatalog.map((registry) => (
+              <div key={registry.name} className="rounded-[22px] border border-slate-200 bg-slate-50 p-4">
+                <p className="text-sm font-semibold text-slate-950">{registry.name}</p>
+                <p className="mt-1 text-sm text-slate-600">{registry.purpose}</p>
+                <p className="mt-2 text-xs text-slate-500">
+                  {registry.contents} • {registry.authority}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="rounded-[30px] border border-cyan-200 bg-cyan-50/70 p-5 shadow-[0_16px_60px_rgba(15,23,42,0.06)]">
+          <p className="text-xs uppercase tracking-[0.24em] text-cyan-700">Live Runtime</p>
+          <div className="mt-4 space-y-3 text-sm text-slate-700">
+            <div className="rounded-[22px] border border-cyan-100 bg-white/90 px-4 py-3">
+              {snapshot.packets.length} packets persisted locally
+            </div>
+            <div className="rounded-[22px] border border-cyan-100 bg-white/90 px-4 py-3">
+              {snapshot.wrapperRegistry.filter((entry) => entry.status === "live").length} live wrappers and{" "}
+              {snapshot.wrapperRegistry.filter((entry) => entry.status === "prepared").length} prepared wrapper paths
+            </div>
+            <div className="rounded-[22px] border border-cyan-100 bg-white/90 px-4 py-3">
+              {snapshot.ledgerEvents.length} append-only ledger events in local storage
+            </div>
+            <div className="rounded-[22px] border border-cyan-100 bg-white/90 px-4 py-3">
+              Ollama state is {snapshot.ollamaConfig.handshakeStatus}
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+=== FILE: src/components/spidernet/input-data-board.tsx ===
+import type { DashboardSnapshot } from "@/lib/spidernet/types";
+
+type InputDataBoardProps = {
+  snapshot: DashboardSnapshot;
+};
+
+export function InputDataBoard({ snapshot }: InputDataBoardProps) {
+  return (
+    <div className="grid gap-4 xl:grid-cols-[minmax(0,1.45fr)_380px]">
+      <section className="space-y-4">
+        <div className="rounded-[30px] border border-white/90 bg-white/88 p-5 shadow-[0_16px_60px_rgba(15,23,42,0.08)]">
+          <div className="grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
+            <div className="space-y-4">
+              <div className="rounded-[26px] border border-slate-200 bg-slate-50 p-4">
+                <p className="text-xs uppercase tracking-[0.22em] text-slate-500">Locked Purpose</p>
+                <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">
+                  Capture first, route later
+                </h2>
+                <p className="mt-2 text-sm leading-7 text-slate-600">
+                  Dash 001 is where a task becomes a packet. It captures objective, classifications, routes, vault targets, and attachments before any routing recommendation is trusted.
+                </p>
+              </div>
+
+              <div className="rounded-[26px] border border-slate-200 bg-slate-50 p-4">
+                <p className="text-xs uppercase tracking-[0.22em] text-slate-500">Intake Packets</p>
+                <div className="mt-4 space-y-3">
+                  {snapshot.intakePackets.map((packet) => (
+                    <article key={packet.packetId} className="rounded-[22px] border border-slate-200 bg-white p-4">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="rounded-full bg-slate-950 px-2.5 py-1 text-xs font-medium text-white">
+                          {packet.packetId}
+                        </span>
+                        {packet.classifications.map((item) => (
+                          <span
+                            key={item}
+                            className="rounded-full border border-cyan-200 bg-cyan-50 px-2.5 py-1 text-xs font-medium text-cyan-700"
+                          >
+                            {item}
+                          </span>
+                        ))}
+                      </div>
+                      <p className="mt-3 text-sm leading-6 text-slate-700">{packet.objective}</p>
+                      <div className="mt-3 flex flex-wrap gap-2 text-xs text-slate-500">
+                        {packet.routes.map((route) => (
+                          <span key={route} className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1">
+                            route:{route}
+                          </span>
+                        ))}
+                        {packet.vaultTargets.map((route) => (
+                          <span
+                            key={`${packet.packetId}-${route}`}
+                            className="rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-amber-700"
+                          >
+                            vault:{route}
+                          </span>
+                        ))}
+                      </div>
+                      <div className="mt-3 rounded-[18px] border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-600">
+                        Intake modes: {packet.intakeModes.join(", ")}. Attachments: {packet.attachments.join(", ")}.
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-[26px] border border-slate-200 bg-slate-50 p-4">
+              <p className="text-xs uppercase tracking-[0.22em] text-slate-500">Policy Route Preview</p>
+              <div className="mt-4 space-y-3">
+                {snapshot.policyDecisions.map((decision) => (
+                  <div key={decision.packetId} className="rounded-[22px] border border-slate-200 bg-white p-4">
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="text-sm font-semibold text-slate-950">{decision.packetId}</p>
+                      <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs text-slate-500">
+                        {decision.exposureDecision}
+                      </span>
+                    </div>
+                    <p className="mt-2 text-sm text-slate-600">
+                      Suggested destination: {decision.boardTitle} through the {decision.lane} lane.
+                    </p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {decision.routeFamilies.map((route) => (
+                        <span
+                          key={`${decision.packetId}-${route}`}
+                          className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs text-slate-500"
+                        >
+                          {route}
+                        </span>
+                      ))}
+                    </div>
+                    {decision.holdReason ? (
+                      <div className="mt-3 rounded-[18px] border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">
+                        Hold reason: {decision.holdReason}
+                      </div>
+                    ) : (
+                      <div className="mt-3 rounded-[18px] border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+                        Routing can proceed after manager review.
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-[30px] border border-white/90 bg-white/88 p-5 shadow-[0_16px_60px_rgba(15,23,42,0.08)]">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="text-xs uppercase tracking-[0.22em] text-slate-500">Typed Packet Model</p>
+              <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">
+                Six packet types, one handoff chain
+              </h2>
+            </div>
+            <div className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-sm text-slate-600">
+              durable local persistence
+            </div>
+          </div>
+
+          <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            {snapshot.packetTemplates.map((template) => (
+              <div key={template.kind} className="rounded-[22px] border border-slate-200 bg-slate-50 p-4">
+                <p className="text-sm font-semibold text-slate-950">{template.name}</p>
+                <p className="mt-2 text-sm text-slate-600">{template.purpose}</p>
+                <p className="mt-3 text-xs text-slate-500">Required: {template.requiredFields.join(", ")}</p>
+                <p className="mt-2 text-xs uppercase tracking-[0.18em] text-slate-500">
+                  {template.persistenceTarget} {"->"} {template.nextHandoff}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="grid gap-4">
+        <div className="rounded-[30px] border border-white/90 bg-white/88 p-5 shadow-[0_16px_60px_rgba(15,23,42,0.08)]">
+          <p className="text-xs uppercase tracking-[0.22em] text-slate-500">Policy Checks</p>
+          <div className="mt-4 space-y-3">
+            {snapshot.policyDecisions[0]?.policyDecisions.map((policy) => (
+              <div key={policy.checkId} className="rounded-[22px] border border-slate-200 bg-slate-50 p-4">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-sm font-semibold text-slate-950">{policy.name}</p>
+                  <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs text-slate-500">
+                    {policy.outcome}
+                  </span>
+                </div>
+                <p className="mt-2 text-sm text-slate-600">{policy.detail}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="rounded-[30px] border border-cyan-200 bg-cyan-50/70 p-5 shadow-[0_16px_60px_rgba(15,23,42,0.06)]">
+          <p className="text-xs uppercase tracking-[0.22em] text-cyan-700">Local Persistence Targets</p>
+          <div className="mt-4 space-y-3 text-sm text-slate-700">
+            <div className="rounded-[22px] border border-cyan-100 bg-white/90 px-4 py-3">
+              Packets: `artifacts/runtime/spidernet/packets`
+            </div>
+            <div className="rounded-[22px] border border-cyan-100 bg-white/90 px-4 py-3">
+              Vaults: `artifacts/runtime/spidernet/vaults`
+            </div>
+            <div className="rounded-[22px] border border-cyan-100 bg-white/90 px-4 py-3">
+              Ledger: `artifacts/runtime/spidernet/ledger`
+            </div>
+            <div className="rounded-[22px] border border-cyan-100 bg-white/90 px-4 py-3">
+              Registries: `artifacts/runtime/spidernet/registries`
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+=== FILE: logs/worklog.md ===
+# Worklog
+
+## 2026-04-14 — white web dashboard alignment and architecture import
+### Done
+- Kept the current white web dashboard family as the only UI direction and did not port the dark Tk desktop styling.
+- Tightened the shared architecture model to make the six locked boards, four lanes, packet flow, vault routing, exposure ladder, Saarthi synthesis, and Chitragupt gates explicit.
+- Reworked the shell for a larger center stage, compact left rail, and clearer right-side control cluster while preserving the existing white layout.
+- Rebuilt all six board views around the registry-driven operating model and novice-first wording.
+- Kept Dash 002 research-only and preserved local persistence under `artifacts/runtime/spidernet`.
+- Updated README, worklog, changes, and FTD to match the current live state.
+
+### Verified
+- `npm run lint` passed.
+- `npm run build` passed.
+- `npm run dev -- --hostname 0.0.0.0 --port 3000` started successfully.
+- `curl -I http://127.0.0.1:3000` returned `HTTP/1.1 200 OK`.
+
+### Active
+- White web SETU remains the live operating surface.
+
+### Remaining
+- Add mutation paths for packet updates if the dashboard needs live editing from the UI.
+- Decide when, if ever, browser automation and desktop automation should move from prepared to live.
+
+### Risks / blockers
+- Ollama remains prepared only.
+- Browser automation and desktop automation remain prepared exposure paths, not active integrations.
+
+## 2026-04-12
+### Done
+- Created project from SpiderNet Master Bootstrap Copier v2-fixed.
+
+### Verified
+- Base structure, templates, and starter governance files created.
+
+### Active
+- Foundation is ready for stack scaffold and local run.
+
+### Remaining
+- Review AGENTS.md and README.md
+- Scaffold the chosen stack
+- Verify local app/service run
+
+## 2026-04-12 — all-in-one scaffold and verification
+### Done
+- Activated Node 20 with nvm.
+- Created clean temporary Next.js scaffold.
+- Merged scaffold into project repo.
+- Installed dependencies.
+- Started local server and verified localhost:3000.
+- Saved first HTML snippet to artifacts/tmp/first-page-snippet.html.
+
+### Verified
+- Local app verification completed at 2026-04-12 22:36:30.
+- HTTP check for localhost:3000 succeeded.
+
+### Active
+- Project now has a real Next.js foundation and a verified local run path.
+
+### Remaining
+- Replace default Next.js page with real SpiderNet Control Deck UI.
+- Add first smoke test script.
+- Build dashboard shell.
+
+### Risks / blockers
+- Test script is not defined in package.json yet.
+
+## 2026-04-14 — dashboard unification and completion
+### Done
+- Replaced the default Next.js starter with a routed SpiderNet dashboard shell.
+- Centralized board metadata, icons, routes, ordering, visibility, and widget registration.
+- Implemented Dash 001 Input Data, Dash 002 Tools Store, and Dash 003 Hive Agents.
+- Prepared Dash 004 SETU Bridge, Dash 005 Observatory, and Dash 006 Memory & Ledger with route shells.
+- Added shared typed contracts and stubs for router, scorecard, policy, ledger, and safety gate.
+- Repaired launcher scripts, desktop launcher behavior, and favicon assets.
+
+### Verified
+- Registry-backed routes now exist for overview and all six boards.
+- Launcher scripts no longer depend on a codex-only finisher path.
+
+### Active
+- Final validation through lint, build, and live local run.
+
+### Remaining
+- Confirm lint, build, and browser response on the final dashboard implementation.
+
+### Risks / blockers
+- No dedicated automated test script exists yet in `package.json`.
+
+## 2026-04-14 — Phase 5 operating-law port and Phase 6 durability
+### Done
+- Imported the Phase 5 operating-law architecture from the DRISHTI desktop line into the existing web SETU repo without creating a second dashboard family.
+- Replaced placeholder board contracts with the locked six-board model, four-lane model, route families, typed packet templates, and policy-before-routing logic.
+- Converted Dash 004, Dash 005, and Dash 006 from prepared shells into live web boards while preserving the current shell and center-stage layout.
+- Added durable local runtime storage under `artifacts/runtime/spidernet` for packets, vaults, registries, ledger events, and Ollama prep config.
+- Added real wrapper registry linkage, skill registry records, score-memory storage, Saarthi synthesis, and Chitragupt readiness gates.
+- Updated architecture, runbook, setup, and troubleshooting docs to match the current implementation state.
+
+### Verified
+- `npm run lint` passed.
+- `npm run build` passed.
+- `npm run dev` started successfully and served `http://127.0.0.1:3000`.
+- `curl -I http://127.0.0.1:3000` returned `HTTP/1.1 200 OK`.
+
+### Active
+- Web SETU repo is now the main operating surface.
+
+### Remaining
+- Add a dedicated automated smoke or test script to `package.json`.
+- Decide when to upgrade prepared exposure paths to live.
+- Wire a real Ollama handshake only after local endpoint confirmation.
+
+### Risks / blockers
+- Ollama is prepared only and is not live.
+- Browser automation and desktop automation remain prepared exposure paths, not active integrations.
+
+=== FILE: logs/changes.md ===
+# Changes
+
+## 2026-04-14 — white web dashboard architecture alignment
+- kept the white web dashboard as the only product family and did not import the Tk visual styling
+- updated shared types and architecture registry to make board names, short labels, exposure ladder, route model, and snapshot data explicit
+- rebuilt the shell for a larger center workspace, compact left rail, and clearer right-side control cluster
+- rewrote the overview and all six live board views for novice-first clarity and registry-driven workflow presentation
+- preserved Dash 002 as research-only and kept manager logic explicit in Dash 003
+- preserved durable local persistence and clarified live versus prepared paths in the Memory & Ledger board
+- rewrote README to describe the white-web-first direction, exact board model, and live versus prepared state
+
+## 2026-04-12
+- initialized project from SpiderNet master vault
+- added docs, plans, logs, tests, scripts, src, artifacts
+- added editor and git hygiene files
+
+## 2026-04-12 — all-in-one scaffold and verification
+- scaffolded next.js app into repo
+- installed dependencies
+- verified localhost:3000
+- saved first page snippet to artifacts/tmp
+
+## 2026-04-14 — dashboard repair and unification
+- replaced default starter page with a routed SpiderNet dashboard shell
+- added central board registry, widget registry, and shared domain contracts
+- added shared data and stubs for router, scorecard, policy, ledger, and safety gate
+- implemented Input Data, Tools Store, and Hive Agents boards
+- prepared routes and shells for SETU Bridge, Observatory, and Memory & Ledger
+- refreshed favicon and launcher icon assets
+- repaired build and open launcher scripts and desktop launcher settings
+- rewrote README with exact run and validation steps
+
+## 2026-04-14 — Phase 5 operating-law architecture port
+- ported the DRISHTI Phase 5 operating-law architecture into the existing Next.js board family
+- locked all six board purposes and kept Dash 002 research-only
+- added four-lane model, route-family registry, packet-template registry, policy registry, and registry catalog
+- added policy enforcement before routing with explicit software exposure decisions
+- added Saarthi synthesis logic and Chitragupt readiness gates
+- added live Dash 004 Specialist Task Execution, Dash 005 Observatory, and Dash 006 Memory & Ledger boards
+- added durable file-backed storage for packets, vaults, wrappers, skills, score memory, ledger events, and Ollama prep config under `artifacts/runtime/spidernet`
+- updated docs for architecture, runbook, setup, and troubleshooting
+
+=== INPUT-DATA ROUTE TREE ===
+src/app/boards
+src/app/boards/[slug]
+src/app/boards/[slug]/page.tsx
+
+=== SPIDERNET LIB TREE ===
+src/lib/spidernet
+src/lib/spidernet/architecture.ts
+src/lib/spidernet/data.ts
+src/lib/spidernet/ledger.ts
+src/lib/spidernet/policy.ts
+src/lib/spidernet/registry.ts
+src/lib/spidernet/router.ts
+src/lib/spidernet/safety.ts
+src/lib/spidernet/scorecard.ts
+src/lib/spidernet/storage.ts
+src/lib/spidernet/storage.ts.save
+src/lib/spidernet/types.ts
+

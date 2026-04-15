@@ -1,0 +1,329 @@
+import "server-only";
+
+import { mkdir, readFile, writeFile } from "node:fs/promisimport path from "node:path";
+
+import {
+  scoreMemorySeed,
+  skillRegistrySeed,
+  wrapperRegistrySeed,
+} from "@/lib/spidernet/architecture";
+import type {
+  ApprovalPacket,
+  ExecutionPacket,
+  IntakePacket,
+  LedgerEvent,
+  OllamaConfig,
+  PassPacket,
+  ResearchPacket,
+  ToolScoreMemory,
+  ValidationPacket,
+  VaultEntry,
+  WrapperRegistryEntry,
+  SkillRegistryEntry,
+} from "@/lib/spidernet/types";
+
+const runtimeRoot = path.join(process.cwd(), "artifacts", "runtime", "spidernet");
+
+const packetSeeds = {
+  intake: [
+    {
+      packetId: "INT-501",
+      kind: "intake",
+      status: "captured",
+      createdAt: "2026-04-14 10:10",
+      manager: "Saarthi",
+      source: "ops-console",
+      objective: "Port the validated DRISHTI Phase 5 operating-law architecture into the web SETU repo and keep the web shell as the main system.",
+      classifications: ["architecture", "build"],
+      routes: ["DNA", "RUL", "BLP"],
+      vaultTargets: ["DNA", "RUL", "BLP"],
+      intakeModes: ["command", "repo scan"],
+      attachments: ["DRISHTI README", "desktop dashboard reference"],
+    },
+    {
+      packetId: "INT-502",
+      kind: "intake",
+      status: "captured",
+      createdAt: "2026-04-14 10:16",
+      manager: "Saarthi",
+      source: "ops-console",
+      objective: "Keep Dash 002 locked to research-only comparison and exposure-path recommendation.",
+      classifications: ["research"],
+      routes: ["RUL", "LIB"],
+      vaultTargets: ["RUL", "LIB"],
+      intakeModes: ["command"],
+      attachments: ["policy registry"],
+    },
+    {
+      packetId: "INT-503",
+      kind: "intake",
+      status: "captured",
+      createdAt: "2026-04-14 10:20",
+      manager: "Saarthi",
+      source: "ops-console",
+      objective: "Prepare Ollama handshake configuration without claiming a live model link until a local endpoint is configured.",
+      classifications: ["future", "ops"],
+      routes: ["FTD", "LIB"],
+      vaultTargets: ["FTD", "LIB"],
+      intakeModes: ["command"],
+      attachments: ["setup notes"],
+    },
+  ] satisfies IntakePacket[],
+  research: [
+    {
+      packetId: "RCH-601",
+      kind: "research",
+      status: "researching",
+      createdAt: "2026-04-14 10:25",
+      manager: "Saarthi",
+      question: "Which exposure path is safest for packet persistence and wrapper linkage in the current Next.js repo?",
+      dispatchedTools: ["Codex Research Pass", "Perplexity Retrieval"],
+      reportTargets: ["RUL", "BLP"],
+      evaluationDimensions: ["durability", "auditability", "operability"],
+    },
+    {
+      packetId: "RCH-602",
+      kind: "research",
+      status: "researching",
+      createdAt: "2026-04-14 10:32",
+      manager: "Saarthi",
+      question: "How should Dash 002 stay research-only while still informing Saarthi's routing decisions?",
+      dispatchedTools: ["Codex Research Pass", "Claude Deliberation"],
+      reportTargets: ["RUL", "DNA"],
+      evaluationDimensions: ["board purpose lock", "manager synthesis", "policy clarity"],
+    },
+  ] satisfies ResearchPacket[],
+  approval: [
+    {
+      packetId: "APR-701",
+      kind: "approval",
+      status: "awaiting_approval",
+      createdAt: "2026-04-14 10:40",
+      manager: "Saarthi",
+      summary: "Architecture merge affects routing law, durable memory, and wrapper posture.",
+      approvers: ["Core Review", "Chitragupt"],
+      readinessState: "review",
+      requiresUserPass: true,
+      approvalScope: ["policy registry", "packet persistence", "wrapper linkage"],
+    },
+  ] satisfies ApprovalPacket[],
+  execution: [
+    {
+      packetId: "EXE-801",
+      kind: "execution",
+      status: "executing",
+      createdAt: "2026-04-14 10:52",
+      manager: "Saarthi",
+      stageOwner: "Builder lane",
+      specialists: ["Architect lane", "Builder lane", "Operator lane"],
+      nextStage: "validation",
+      blockers: [],
+      toolExposureDecision: "cli",
+    },
+  ] satisfies ExecutionPacket[],
+  validation: [
+    {
+      packetId: "VAL-901",
+      kind: "validation",
+      status: "validating",
+      createdAt: "2026-04-14 11:05",
+      manager: "Saarthi",
+      testStreams: ["eslint", "next build", "local dev boot"],
+      simulationStreams: ["policy routing review", "wrapper linkage review"],
+      auditStreams: ["worklog update", "FTD update", "changes update"],
+      gatekeeper: "Chitragupt",
+      definitionOfDone: ["app runs locally", "lint passes", "build passes", "docs and logs updated"],
+    },
+  ] satisfies ValidationPacket[],
+  pass: [
+    {
+      packetId: "PAS-950",
+      kind: "pass",
+      status: "closed",
+      createdAt: "2026-04-14 11:18",
+      manager: "Saarthi",
+      decision: "Architecture port completed in the web repo with local persistence and routing law visible.",
+      ledgerRoutes: ["DNA", "RUL", "LIB", "BLP"],
+      retrospectiveTargets: ["runbook", "setup", "troubleshooting"],
+      signedBy: ["Builder lane", "Operator lane"],
+      closeoutArtifacts: ["lint", "build", "local dev run"],
+    },
+  ] satisfies PassPacket[],
+};
+
+const vaultSeeds: VaultEntry[] = [
+  {
+    id: "DNA-001",
+    route: "DNA",
+    title: "SETU web repo is the main product",
+    summary: "Architecture ports into the existing web shell rather than creating a second dashboard family.",
+    sourcePacketId: "INT-501",
+    status: "live",
+    updatedAt: "2026-04-14 11:18",
+  },
+  {
+    id: "RUL-001",
+    route: "RUL",
+    title: "Policy checks happen before routing",
+    summary: "Danger, approval, FTD, research, and exposure decisions all resolve before a packet reaches a board.",
+    sourcePacketId: "INT-501",
+    status: "live",
+    updatedAt: "2026-04-14 11:18",
+  },
+  {
+    id: "LIB-001",
+    route: "LIB",
+    title: "Wrapper and skill registries are durable local records",
+    summary: "Wrapper linkage and skill discovery now live in repo-local JSON storage.",
+    sourcePacketId: "EXE-801",
+    status: "live",
+    updatedAt: "2026-04-14 11:18",
+  },
+  {
+    id: "BLP-001",
+    route: "BLP",
+    title: "Phase 6 implementation baseline",
+    summary: "Durable packets, vaults, wrapper linkage, and score memory are active in the Next.js repo.",
+    sourcePacketId: "VAL-901",
+    status: "live",
+    updatedAt: "2026-04-14 11:18",
+  },
+  {
+    id: "FTD-001",
+    route: "FTD",
+    title: "Ollama live handshake remains deferred",
+    summary: "Local config is prepared but the endpoint is not claimed live until explicitly configured.",
+    sourcePacketId: "INT-503",
+    status: "prepared",
+    updatedAt: "2026-04-14 11:18",
+  },
+];
+
+const ledgerSeed: LedgerEvent[] = [
+  {
+    id: "LED-1201",
+    actor: "system",
+    action: "runtime.storage_seeded",
+    scope: "artifacts/runtime/spidernet",
+    timestamp: "2026-04-14 11:00",
+    appendOnly: true,
+  },
+  {
+    id: "LED-1202",
+    actor: "Saarthi",
+    action: "policy.routing_evaluated",
+    scope: "Intake packet set",
+    timestamp: "2026-04-14 11:08",
+    appendOnly: true,
+  },
+  {
+    id: "LED-1203",
+    actor: "Operator lane",
+    action: "validation.pending_runtime_check",
+    scope: "lint, build, local dev run",
+    timestamp: "2026-04-14 11:12",
+    appendOnly: true,
+  },
+];
+
+const ollamaSeed: OllamaConfig = {
+  endpoint: "http://127.0.0.1:11434",
+  model: "llama3.1:8b",
+  handshakeStatus: "prepared",
+  lastCheckedAt: "2026-04-14 11:15",
+  note: "Configuration scaffold is present. Live handshake is intentionally not claimed until a local Ollama endpoint is confirmed.",
+};
+
+const fileMap = {
+  intake: "packets/intake.json",
+  research: "packets/research.json",
+  approval: "packets/approval.json",
+  execution: "packets/execution.json",
+  validation: "packets/validation.json",
+  pass: "packets/pass.json",
+  wrappers: "registries/wrappers.json",
+  skills: "registries/skills.json",
+  scores: "registries/scores.json",
+  vaults: "vaults/index.json",
+  ledger: "ledger/events.json",
+  ollama: "config/ollama.json",
+} as const;
+
+async function ensureFile<T>(relativePath: string, fallback: T) {
+  const target = path.join(runtimeRoot, relativePath);
+  await mkdir(path.dirname(target), { recursive: true });
+
+  try {
+    await readFile(target, "utf8");
+  } catch {
+    await writeFile(target, JSON.stringify(fallback, null, 2), "utf8");
+  }
+}
+
+async function readJson<T>(relativePath: string): Promise<T> {
+  const target = path.join(runtimeRoot, relativePath);
+  const raw = await readFile(target, "utf8");
+  return JSON.parse(raw) as T;
+}
+
+export async function ensureRuntimeStorage() {
+  await ensureFile(fileMap.intake, packetSeeds.intake);
+  await ensureFile(fileMap.research, packetSeeds.research);
+  await ensureFile(fileMap.approval, packetSeeds.approval);
+  await ensureFile(fileMap.execution, packetSeeds.execution);
+  await ensureFile(fileMap.validation, packetSeeds.validation);
+  await ensureFile(fileMap.pass, packetSeeds.pass);
+  await ensureFile(fileMap.wrappers, wrapperRegistrySeed);
+  await ensureFile(fileMap.skills, skillRegistrySeed);
+  await ensureFile(fileMap.scores, scoreMemorySeed);
+  await ensureFile(fileMap.vaults, vaultSeeds);
+  await ensureFile(fileMap.ledger, ledgerSeed);
+  await ensureFile(fileMap.ollama, ollamaSeed);
+}
+
+export async function loadRuntimeStorage() {
+  await ensureRuntimeStorage();
+
+  const [
+    intakePackets,
+    researchPackets,
+    approvalPackets,
+    executionPackets,
+    validationPackets,
+    passPackets,
+    wrapperRegistry,
+    skillRegistry,
+    scoreMemory,
+    vaultEntries,
+    ledgerEvents,
+    ollamaConfig,
+  ] = await Promise.all([
+    readJson<IntakePacket[]>(fileMap.intake),
+    readJson<ResearchPacket[]>(fileMap.research),
+    readJson<ApprovalPacket[]>(fileMap.approval),
+    readJson<ExecutionPacket[]>(fileMap.execution),
+    readJson<ValidationPacket[]>(fileMap.validation),
+    readJson<PassPacket[]>(fileMap.pass),
+    readJson<WrapperRegistryEntry[]>(fileMap.wrappers),
+    readJson<SkillRegistryEntry[]>(fileMap.skills),
+    readJson<ToolScoreMemory[]>(fileMap.scores),
+    readJson<VaultEntry[]>(fileMap.vaults),
+    readJson<LedgerEvent[]>(fileMap.ledger),
+    readJson<OllamaConfig>(fileMap.ollama),
+  ]);
+
+  return {
+    intakePackets,
+    researchPackets,
+    approvalPackets,
+    executionPackets,
+    validationPackets,
+    passPackets,
+    wrapperRegistry,
+    skillRegistry,
+    scoreMemory,
+    vaultEntries,
+    ledgerEvents,
+    ollamaConfig,
+  };
+}

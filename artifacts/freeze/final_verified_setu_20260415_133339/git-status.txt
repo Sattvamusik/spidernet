@@ -1,0 +1,35 @@
+ M README.md
+ M docs/architecture.md
+ M docs/runbook.md
+ M docs/setup.md
+ M docs/spidernet-operating-rules.md
+ M docs/troubleshooting.md
+ M logs/changes.md
+ M logs/worklog.md
+ M next-env.d.ts
+ M package-lock.json
+ M plans/ftd.md
+ M src/app/globals.css
+ M src/app/layout.tsx
+ M src/app/page.tsx
+ M tsconfig.json
+?? artifacts/freeze/
+?? artifacts/runtime/
+?? assets/
+?? blp/
+?? dna/
+?? docs/dashboard_finish_note.txt
+?? lib/
+?? prompts/
+?? public/favicon.svg
+?? public/spidernet-dashboard.svg
+?? rul/
+?? scripts/SpiderNet-Dashboard.desktop
+?? scripts/build_or_repair_spidernet_dashboard.sh
+?? scripts/open_spidernet_dashboard.sh
+?? scripts/reset_runtime_and_run.sh
+?? scripts/run_codex_finish.sh
+?? src/app/api/
+?? src/app/boards/
+?? src/components/
+?? src/lib/

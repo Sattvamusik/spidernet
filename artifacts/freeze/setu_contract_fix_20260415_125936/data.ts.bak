@@ -1,0 +1,111 @@
+import { loadRuntimeStorage } from "./storage";
+
+type QuickStat = {
+  label: string;
+  value: string;
+};
+
+type SnapshotRecord = Record<string, any>;
+
+function safeArray(value: any) {
+  return Array.isArray(value) ? value : [];
+}
+
+function withArrayFallbacks(base: SnapshotRecord): SnapshotRecord {
+  return new Proxy(base, {
+    get(target, prop: string | symbol) {
+      if (typeof prop !== "string") return (target as any)[prop];
+      if (prop in target) return target[prop];
+      return [];
+    },
+  });
+}
+
+export function getDashboardSnapshot() {
+  const runtime = loadRuntimeStorage();
+
+  const intakePackets = safeArray(runtime.intakePackets);
+  const researchPackets = safeArray(runtime.researchPackets);
+  const executionPackets = safeArray(runtime.executionPackets);
+  const validationPackets = safeArray(runtime.validationPackets);
+  const approvalPackets = safeArray(runtime.approvalPackets);
+  const passPackets = safeArray(runtime.passPackets);
+
+  const wrapperRegistry = safeArray(runtime.wrapperRegistry);
+  const skillRegistry = safeArray(runtime.skillRegistry);
+  const scoreRegistry = safeArray(runtime.scoreRegistry);
+  const ledgerEvents = safeArray(runtime.ledgerEvents);
+  const vaultEntries = safeArray(runtime.vaultEntries);
+
+  return withArrayFallbacks({
+    intakePackets,
+    researchPackets,
+    executionPackets,
+    validationPackets,
+    approvalPackets,
+    passPackets,
+    wrapperRegistry,
+    skillRegistry,
+    scoreRegistry,
+    ledgerEvents,
+    vaultEntries,
+
+    laneModel: [
+      { name: "Intake", description: "Incoming requests and raw packets.", count: intakePackets.length },
+      { name: "Research", description: "Research tasks and evidence gathering.", count: researchPackets.length },
+      { name: "Execution", description: "Build and execution work in progress.", count: executionPackets.length },
+      { name: "Validation", description: "Checks, tests, and verification tasks.", count: validationPackets.length },
+      { name: "Approval", description: "Approval and review queue.", count: approvalPackets.length },
+      { name: "Pass", description: "Completed and accepted work.", count: passPackets.length },
+    ],
+
+    routeFamilies: [
+      { route: "/boards/input-data", title: "Input Data", description: "Intake, triage, and packet entry.", count: intakePackets.length },
+      { route: "/boards/tools-store", title: "Tools Store", description: "Tool inventory and research helpers.", count: wrapperRegistry.length },
+      { route: "/boards/hive-agents", title: "Hive Agents", description: "Execution, oversight, and agent coordination.", count: executionPackets.length + approvalPackets.length },
+      { route: "/boards/observatory", title: "Observatory", description: "Signals, ledger activity, and runtime visibility.", count: ledgerEvents.length },
+      { route: "/boards/memory-ledger", title: "Memory & Ledger", description: "Stored memory, vault entries, and persistent records.", count: vaultEntries.length },
+    ],
+
+    exposureDecisionLadder: [
+      { key: "intake", title: "Intake", detail: "Capture and normalize incoming work.", status: intakePackets.length > 0 ? "active" : "idle" },
+      { key: "research", title: "Research", detail: "Collect evidence and context before execution.", status: researchPackets.length > 0 ? "active" : "idle" },
+      { key: "execution", title: "Execution", detail: "Perform implementation and changes.", status: executionPackets.length > 0 ? "active" : "idle" },
+      { key: "validation", title: "Validation", detail: "Verify work and inspect outcomes.", status: validationPackets.length > 0 ? "active" : "idle" },
+      { key: "approval", title: "Approval", detail: "Route completed work for decision and sign-off.", status: approvalPackets.length > 0 ? "active" : "idle" },
+      { key: "memory", title: "Memory", detail: "Persist outcomes into ledger and vault.", status: ledgerEvents.length > 0 || vaultEntries.length > 0 ? "active" : "idle" },
+    ],
+
+    registryCatalog: [
+      { name: "Wrappers", purpose: "Tool and execution wrapper inventory.", count: wrapperRegistry.length },
+      { name: "Skills", purpose: "Registered skill and capability memory.", count: skillRegistry.length },
+      { name: "Scores", purpose: "Tool score memory and evaluation records.", count: scoreRegistry.length },
+      { name: "Ledger", purpose: "Append-only event history.", count: ledgerEvents.length },
+      { name: "Vault", purpose: "Persisted vault entries and memory records.", count: vaultEntries.length },
+    ],
+  });
+}
+
+export function getBoardQuickStats(): QuickStat[] {
+  const runtime = loadRuntimeStorage();
+
+  const intakePackets = safeArray(runtime.intakePackets);
+  const researchPackets = safeArray(runtime.researchPackets);
+  const executionPackets = safeArray(runtime.executionPackets);
+  const validationPackets = safeArray(runtime.validationPackets);
+  const approvalPackets = safeArray(runtime.approvalPackets);
+  const passPackets = safeArray(runtime.passPackets);
+  const wrapperRegistry = safeArray(runtime.wrapperRegistry);
+  const ledgerEvents = safeArray(runtime.ledgerEvents);
+
+  return [
+    { label: "Intake", value: String(intakePackets.length) },
+    { label: "Research", value: String(researchPackets.length) },
+    { label: "Execution", value: String(executionPackets.length) },
+    { label: "Validation", value: String(validationPackets.length) },
+    { label: "Approval", value: String(approvalPackets.length) },
+    { label: "Pass", value: String(passPackets.length) },
+    { label: "Wrappers", value: String(wrapperRegistry.length) },
+    { label: "Ledger", value: String(ledgerEvents.length) },
+  ];
+}

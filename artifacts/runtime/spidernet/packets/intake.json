@@ -1,0 +1,134 @@
+[
+  {
+    "packetId": "intake-2026-04-15T07-37-02-954Z-7d05a8d9",
+    "objective": "Dash 001 intake packet created from the white SETU UI.",
+    "classifications": [
+      "dash-001",
+      "manual-trigger",
+      "safe-default"
+    ],
+    "routes": [
+      "/boards/input-data"
+    ],
+    "vaultTargets": [
+      "/boards/memory-ledger"
+    ],
+    "intakeModes": [
+      "ui-trigger"
+    ],
+    "attachments": [],
+    "status": "captured",
+    "createdAt": "2026-04-15T07:37:02.954Z",
+    "source": "white-web-setu"
+  },
+  {
+    "packetId": "intake-2026-04-15T07-51-10-872Z-e600e6f0",
+    "objective": "Dash 001 intake packet created from the white SETU UI.",
+    "classifications": [
+      "dash-001",
+      "manual-trigger",
+      "safe-default"
+    ],
+    "routes": [
+      "/boards/input-data"
+    ],
+    "vaultTargets": [
+      "/boards/memory-ledger"
+    ],
+    "intakeModes": [
+      "ui-trigger"
+    ],
+    "attachments": [],
+    "status": "captured",
+    "createdAt": "2026-04-15T07:51:10.872Z",
+    "source": "white-web-setu"
+  },
+  {
+    "packetId": "intake-2026-04-15T08-14-43-548Z-1ca960e0",
+    "objective": "Dash 001 intake packet created from the white SETU UI.",
+    "classifications": [
+      "dash-001",
+      "manual-trigger",
+      "safe-default"
+    ],
+    "routes": [
+      "/boards/input-data"
+    ],
+    "vaultTargets": [
+      "/boards/memory-ledger"
+    ],
+    "intakeModes": [
+      "ui-trigger"
+    ],
+    "attachments": [],
+    "status": "captured",
+    "createdAt": "2026-04-15T08:14:43.548Z",
+    "source": "white-web-setu"
+  },
+  {
+    "packetId": "intake-2026-04-15T09-13-54-648Z-7a691dcd",
+    "objective": "Dash 001 intake packet created from the white SETU UI.",
+    "classifications": [
+      "dash-001",
+      "manual-trigger",
+      "safe-default"
+    ],
+    "routes": [
+      "/boards/input-data"
+    ],
+    "vaultTargets": [
+      "/boards/memory-ledger"
+    ],
+    "intakeModes": [
+      "ui-trigger"
+    ],
+    "attachments": [],
+    "status": "captured",
+    "createdAt": "2026-04-15T09:13:54.648Z",
+    "source": "white-web-setu"
+  },
+  {
+    "packetId": "intake-2026-04-15T09-18-15-746Z-1a1c4201",
+    "objective": "Dash 001 intake packet created from the white SETU UI.",
+    "classifications": [
+      "dash-001",
+      "manual-trigger",
+      "safe-default"
+    ],
+    "routes": [
+      "/boards/input-data"
+    ],
+    "vaultTargets": [
+      "/boards/memory-ledger"
+    ],
+    "intakeModes": [
+      "ui-trigger"
+    ],
+    "attachments": [],
+    "status": "captured",
+    "createdAt": "2026-04-15T09:18:15.746Z",
+    "source": "white-web-setu"
+  },
+  {
+    "packetId": "intake-2026-04-15T09-28-09-267Z-abb97152",
+    "objective": "Dash 001 intake packet created from the white SETU UI.",
+    "classifications": [
+      "dash-001",
+      "manual-trigger",
+      "safe-default"
+    ],
+    "routes": [
+      "/boards/input-data"
+    ],
+    "vaultTargets": [
+      "/boards/memory-ledger"
+    ],
+    "intakeModes": [
+      "ui-trigger"
+    ],
+    "attachments": [],
+    "status": "captured",
+    "createdAt": "2026-04-15T09:28:09.267Z",
+    "source": "white-web-setu"
+  }
+]

@@ -1,0 +1,14 @@
+Project directory:
+/home/sattv/projects/spidernet-control-deck
+
+Desktop launcher:
+/home/sattv/Desktop/SpiderNet-Dashboard.desktop
+
+App launcher:
+/home/sattv/.local/share/applications/SpiderNet-Dashboard.desktop
+
+Main open command:
+/home/sattv/projects/spidernet-control-deck/scripts/open_spidernet_dashboard.sh
+
+Codex finisher:
+/home/sattv/projects/spidernet-control-deck/scripts/run_codex_finish.sh

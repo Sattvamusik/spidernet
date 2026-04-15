@@ -1,0 +1,15 @@
+export {
+  boardRegistry,
+  compatibilityRegistry,
+  exposureDecisionLadder,
+  laneRegistry,
+  packetTemplateRegistry,
+  policyRegistry,
+  registryCatalog,
+  researchToolRegistry,
+  routeFamilyRegistry,
+  skillRegistrySeed,
+  specialistRegistry,
+  widgetRegistry,
+  wrapperRegistrySeed,
+} from "@/lib/spidernet/architecture";

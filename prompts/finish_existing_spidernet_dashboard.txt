@@ -1,0 +1,153 @@
+You are inside the existing SpiderNet dashboard project.
+
+MANDATORY FIRST ACTION
+Inspect the whole workspace and determine what already exists.
+Do not rebuild from zero.
+Do not create duplicate parallel app structures.
+Continue and finish the existing dashboard implementation.
+
+CURRENT EXPECTATION
+Dashboards already exist in some form:
+- Dash 001 Input Data
+- Dash 002 Tools Store
+- Dash 003 Hive Agents
+
+YOUR JOB
+Repair, extend, unify, and finish them into one coherent production-ready dashboard app.
+
+NON-NEGOTIABLE RULES
+- reuse existing code where good
+- improve existing code where incomplete
+- remove dead duplicate pages/components only if clearly obsolete and safe
+- centralize board names, routes, icons, ordering, visibility
+- no wasteful rewrite
+- no toy mockup
+- no half-finished placeholders for the main 3 dashboards
+- favicon and launcher support required
+- verify local run before finishing
+
+UI DIRECTION
+Use attached image only as inspiration for:
+- compact left rail
+- large clean search/command area
+- calm spacing
+- modular cards
+- premium but restrained layout
+Do not copy Canva branding or exact design.
+
+REQUIRED BOARDS
+
+1. Dash 001 Input Data
+Must include:
+- command input
+- file drop
+- project selector
+- priority selector
+- route selector
+- recent inputs
+- unsorted inbox
+- FTD list
+- quick classify actions
+- source tags
+- timestamps
+- save as task / bug / note / asset / research / future
+
+2. Dash 002 Tools Store
+Must include:
+- tool search
+- category filters
+- local/cloud toggle
+- health
+- cost
+- latency
+- recommended tool by task type
+- status chips
+- connector status
+- automation controls
+- favorites
+- alphabetical ordering where relevant
+
+3. Dash 003 Hive Agents
+Must include:
+- active missions
+- workflow state
+- blockers
+- ownership
+- approvals
+- service health
+- workflow graph zone
+- decision queue zone
+- audit log zone
+- serious orchestration layout
+
+PREPARE ONLY
+- Dash 004 SETU Bridge
+- Dash 005 Observatory
+- Dash 006 Memory & Ledger
+
+These prepared boards need:
+- routes
+- central registry metadata
+- page shell
+- short description
+No full implementation yet.
+
+BACKEND / FOUNDATION
+Create or complete:
+- central dashboard config
+- board registry
+- widget/module registry
+- types/contracts:
+  - task input
+  - task result
+  - tool rating
+  - workflow event
+  - ledger event
+- router stub
+- specialist scorecard stub
+- local/cloud toggle policy stub
+- append-only ledger stub
+- execution safety gate stub
+
+FILES TO CREATE OR REPAIR
+- favicon in public/
+- scripts/open_spidernet_dashboard.sh
+- scripts/build_or_repair_spidernet_dashboard.sh
+- scripts/SpiderNet-Dashboard.desktop
+- README with exact run steps
+
+LAUNCHER BEHAVIOR
+- detect package manager
+- install missing dependencies if needed
+- start app on stable default port
+- open browser automatically if possible
+
+STACK
+Prefer the existing stack.
+If stack is broken or missing, finish with a reliable stack such as:
+- Next.js
+- React
+- TypeScript
+- Tailwind
+
+WORKFLOW
+1. inspect workspace
+2. identify current app entry points and routes
+3. identify missing pieces
+4. repair in place
+5. unify naming and navigation
+6. add icon + launcher
+7. install dependencies
+8. run locally
+9. verify
+10. print summary
+
+FINAL OUTPUT
+Print:
+- file tree summary
+- existing files reused
+- files newly created
+- exact local run command
+- exact port
+- what works now
+- what is prepared for later

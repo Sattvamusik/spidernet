@@ -1,62 +1,68 @@
 # Architecture
 
 ## Goal
-Build a disciplined internal operations console for SpiderNet that can later expose service health, logs, workflow status, execution state, and controlled operational actions through a clean interface.
+Run SpiderNet Control Deck as the main SETU web product with the validated DRISHTI Phase 5 operating-law architecture translated into the existing Next.js shell.
 
-## Users
-internal ops team
+## Core model
+- locked six-board purpose model
+- four-lane operating model: Architect, Builder, Auditor, Operator
+- route families: DNA, RUL, LIB, BLP, FTD
+- typed workflow packets: intake, research, approval, execution, validation, pass
+- policy checks before routing
+- registry-driven architecture
+- append-only ledger and vault storage
 
-## Scope
-Phase 01 covers foundation only:
-- repository structure
-- operating rules
-- core documentation
-- starter commands
-- initial local environment setup
-- initial Git baseline
+## Board purpose locks
+- Dash 001: SETU Input Terminal
+- Dash 002: Research Tools
+- Dash 003: Hive Orchestrator
+- Dash 004: Specialist Task Execution
+- Dash 005: Observatory
+- Dash 006: Memory & Ledger
 
-## Out of scope
-Phase 01 does not include:
-- full UI implementation
-- backend business logic
-- production deployment
-- real integrations
-- authentication
-- observability stack wiring
+Dash 002 is research-only. It compares tools, fit, worth-doing, and exposure choices. It does not act as an execution surface.
+
+## Storage model
+Durable local storage now lives in:
+- `artifacts/runtime/spidernet/packets`
+- `artifacts/runtime/spidernet/registries`
+- `artifacts/runtime/spidernet/vaults`
+- `artifacts/runtime/spidernet/ledger`
+- `artifacts/runtime/spidernet/config`
+
+The app seeds these files on first run if they do not exist. Packet, vault, wrapper, skill, score-memory, ledger, and Ollama-prep data are file-backed instead of kept only in code memory.
+
+## Routing model
+1. Intake packets are loaded.
+2. Policy checks run before routing.
+3. Saarthi produces synthesis and proposed route.
+4. Chitragupt readiness gates determine whether the path is ready, review, hold, or prepared.
+5. Wrapper exposure path is recorded as one of:
+   - API
+   - CLI
+   - browser automation
+   - desktop automation
+   - manual hold
+
+## Live vs prepared
+Live:
+- six board surfaces in the web shell
+- durable packet persistence
+- local vault storage
+- policy enforcement before routing
+- wrapper registry linkage
+- skill registry display
+- score-memory storage
+- manager synthesis logic
+- readiness-gate display
+
+Prepared only:
+- Ollama config and handshake posture
+- browser automation exposure path
+- desktop automation exposure path
 
 ## Stack
-Next.js + Node + Tailwind
-
-## Main components
-- UI: Next.js frontend
-- API: Node/Next server routes
-- storage: to be decided in a later phase
-- background jobs: to be defined later if needed
-- observability: to be defined later
-
-## Data flow
-1. User opens the ops console.
-2. Frontend requests status or control data.
-3. Application layer processes request.
-4. Logs and checks are recorded.
-
-## Service inventory
-- service name: web app
-- purpose: internal operations console
-- port: 3000
-- log location: terminal output initially
-- start command: npm run dev
-- stop command: Ctrl+C in terminal
-- health check: app responds on localhost:3000
-
-## Risks
-- Commands are defined before full app scaffold exists.
-- Real implementation is not started yet.
-- Test and typecheck commands may need adjustment after scaffold generation.
-
-## Guardrails
-- Do not expose secrets.
-- Keep `main` stable.
-- Use small scoped changes.
-- Validate after changes.
-- Update worklog and FTD after each phase.
+- Next.js 16
+- React 19
+- Tailwind 4
+- repo-local JSON storage for current Phase 6 durability work

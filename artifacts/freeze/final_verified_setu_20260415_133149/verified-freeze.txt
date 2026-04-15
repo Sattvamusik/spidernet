@@ -1,0 +1,8 @@
+timestamp: 2026-04-15T13:31:49+05:30
+repo: /home/sattv/projects/spidernet-control-deck
+branch: fix/setu-storage-data-contract-001
+root_route: HTTP/1.1 200 OK
+input_data_route: HTTP/1.1 200 OK
+intake_file: artifacts/runtime/spidernet/packets/intake.json
+ledger_file: artifacts/runtime/spidernet/ledger/events.json
+notes: white UI preserved, build passed, Dash 001 intake write verified

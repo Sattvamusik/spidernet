@@ -1,0 +1,26 @@
+timestamp: 2026-04-15T13:21:13+05:30
+repo: /home/sattv/projects/spidernet-control-deck
+branch: fix/setu-storage-data-contract-001
+root_route: HTTP/1.1 200 OK
+Vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Accept-Encoding
+link: </_next/static/media/0c89a48fa5027cee-s.p.0rd3rjvnnhw7n.woff2>; rel=preload; as="font"; crossorigin=""; type="font/woff2", </_next/static/media/99e609270109b47d-s.p.16-z~2sp29ex6.woff2>; rel=preload; as="font"; crossorigin=""; type="font/woff2", </_next/static/media/effe91970fc4db64-s.p.07ig5l8azj~hy.woff2>; rel=preload; as="font"; crossorigin=""; type="font/woff2"
+Cache-Control: no-cache, must-revalidate
+X-Powered-By: Next.js
+Content-Type: text/html; charset=utf-8
+Date: Wed, 15 Apr 2026 07:51:13 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+input_data_route: HTTP/1.1 200 OK
+Vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Accept-Encoding
+link: </_next/static/media/0c89a48fa5027cee-s.p.0rd3rjvnnhw7n.woff2>; rel=preload; as="font"; crossorigin=""; type="font/woff2", </_next/static/media/99e609270109b47d-s.p.16-z~2sp29ex6.woff2>; rel=preload; as="font"; crossorigin=""; type="font/woff2", </_next/static/media/effe91970fc4db64-s.p.07ig5l8azj~hy.woff2>; rel=preload; as="font"; crossorigin=""; type="font/woff2"
+Cache-Control: no-cache, must-revalidate
+X-Powered-By: Next.js
+Content-Type: text/html; charset=utf-8
+Date: Wed, 15 Apr 2026 07:51:13 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+intake_file: artifacts/runtime/spidernet/packets/intake.json
+ledger_file: artifacts/runtime/spidernet/ledger/events.json
+notes: white UI preserved, build hygiene fixed, Dash 001 intake write verified

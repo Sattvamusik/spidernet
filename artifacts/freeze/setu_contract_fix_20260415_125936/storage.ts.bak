@@ -1,0 +1,38 @@
+import fs from "fs";
+import path from "path";
+
+const BASE = path.join(process.cwd(), "artifacts/runtime/spidernet");
+
+function read(file: string, fallback: any) {
+  try {
+    if (!fs.existsSync(file)) return fallback;
+    const raw = fs.readFileSync(file, "utf8").trim();
+    if (!raw) return fallback;
+    return JSON.parse(raw);
+  } catch {
+    return fallback;
+  }
+}
+
+function ensureArray(v: any) {
+  return Array.isArray(v) ? v : [];
+}
+
+export function loadRuntimeStorage() {
+  return {
+    intakePackets: ensureArray(read(`${BASE}/packets/intake.json`, [])),
+    researchPackets: ensureArray(read(`${BASE}/packets/research.json`, [])),
+    executionPackets: ensureArray(read(`${BASE}/packets/execution.json`, [])),
+    validationPackets: ensureArray(read(`${BASE}/packets/validation.json`, [])),
+    approvalPackets: ensureArray(read(`${BASE}/packets/approval.json`, [])),
+    passPackets: ensureArray(read(`${BASE}/packets/pass.json`, [])),
+
+    wrapperRegistry: ensureArray(read(`${BASE}/registries/wrappers.json`, [])),
+    skillRegistry: ensureArray(read(`${BASE}/registries/skills.json`, [])),
+    scoreRegistry: ensureArray(read(`${BASE}/registries/scores.json`, [])),
+
+    ledgerEvents: ensureArray(read(`${BASE}/ledger/events.json`, [])),
+
+    vaultEntries: Object.values(read(`${BASE}/vaults/index.json`, {}))
+  };
+}

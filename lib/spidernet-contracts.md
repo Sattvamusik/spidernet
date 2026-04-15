@@ -1,0 +1,50 @@
+# 🕸 SPIDERNET/VATAYAN — CONTRACTS LIBRARY
+
+## EVENT CONTRACT
+{
+  "id": "evt_*",
+  "type": "string",
+  "source": "string",
+  "created_at": "ISO-8601",
+  "payload": {}
+}
+
+## PACKET CONTRACT
+{
+  "id": "pkt_*",
+  "type": "intake|research|execution|validation|approval|pass",
+  "classification": "string",
+  "input": "string",
+  "status": "created|queued|running|blocked|done",
+  "created_at": "ISO-8601"
+}
+
+## LEDGER CONTRACT
+{
+  "id": "led_*",
+  "action": "string",
+  "packetId": "string",
+  "packetType": "string",
+  "created_at": "ISO-8601"
+}
+
+## ADAPTER CONTRACT
+Each adapter must expose:
+- send(task)
+- status()
+- receive(result)
+
+## STORAGE CONTRACT
+Runtime storage readers currently expect:
+- intakePackets: array
+- researchPackets: array
+- executionPackets: array
+- validationPackets: array
+- approvalPackets: array
+- passPackets: array
+- wrapperRegistry: array
+- skillRegistry: array
+- scoreRegistry: array
+- ledgerEvents: array
+- vaultIndex: object
+- ollamaConfig: object

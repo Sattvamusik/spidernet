@@ -1,0 +1,51 @@
+SpiderNet / SETU repo audit and improve.
+
+Address operator as Vatayan ji.
+
+Goals:
+1. Audit current SETU truth from code.
+2. Identify stale launcher logic.
+3. Identify smallest safe improvements needed now.
+4. Finalize internally, then make only justified minimal changes.
+5. If coding-flow is not wired into Dash 001 intake path, wire it in safely.
+6. Keep launcher truthful about local coding lane, including .venv-tools/bin/aider if present.
+7. Verify with real commands and report only what actually passed.
+
+Non-negotiables:
+- Do not redesign UI.
+- Keep white SETU UI unchanged.
+- Do not touch unrelated files.
+- Treat bridge/compatibility logic as inventory, not final truth.
+- Prefer minimal, typed, safe changes.
+- Keep everything local-first.
+- Never claim verified unless checks actually pass.
+
+Inspect first:
+- src/app/api/spidernet/intake/route.ts
+- src/lib/spidernet/coding-flow.ts
+- src/lib/spidernet/harness.ts
+- src/lib/spidernet/socrates.ts
+- src/lib/spidernet/chanakya.ts
+- src/lib/spidernet/brain-manager.ts
+- src/lib/spidernet/ollama-manager.ts
+- src/lib/spidernet/storage.ts
+- src/lib/spidernet/data.ts
+- scripts/spidernet-coding-launcher.sh
+
+After changes, run:
+- npm run build
+- ./scripts/spidernet-coding-launcher.sh status
+- ./scripts/spidernet-coding-launcher.sh check || true
+- ./scripts/spidernet-local-code-status.sh || true
+- ./scripts/spidernet-local-code-quickcheck.sh || true
+
+If port 3000 is already serving:
+- curl -I http://127.0.0.1:3000/
+- curl -I http://127.0.0.1:3000/boards/input-data
+- curl -s -o /tmp/setu_post.html -D /tmp/setu_post_headers.txt -X POST http://127.0.0.1:3000/api/spidernet/intake
+- cat /tmp/setu_post_headers.txt
+
+In the final report, separate:
+- verified in this run
+- inferred from code
+- deferred
