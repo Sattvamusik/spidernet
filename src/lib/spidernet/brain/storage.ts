@@ -20,6 +20,13 @@ export class BrainPostureReadError extends Error {
   }
 }
 
+export class BrainPostureWriteError extends Error {
+  constructor(message: string, options?: { cause?: unknown }) {
+    super(message, options);
+    this.name = "BrainPostureWriteError";
+  }
+}
+
 const SCAFFOLD_NOTE = "Scaffold only. No live handshake verified.";
 
 const VALID_TIERS: readonly BrainTier[] = [
@@ -75,6 +82,61 @@ export function readPostureFile(): BrainPostureSnapshot {
   }
 
   return validateSnapshot(parsed);
+}
+
+export function writePostureFile(snapshot: BrainPostureSnapshot): void {
+  let validated: BrainPostureSnapshot;
+  try {
+    validated = validateSnapshot(snapshot);
+  } catch (cause) {
+    throw new BrainPostureWriteError(
+      "Refusing to write invalid brain posture snapshot.",
+      { cause },
+    );
+  }
+
+  const dir = path.dirname(BRAIN_POSTURE_FILE);
+  try {
+    fs.mkdirSync(dir, { recursive: true });
+  } catch (cause) {
+    throw new BrainPostureWriteError(
+      `Failed to ensure brain posture directory exists: ${dir}.`,
+      { cause },
+    );
+  }
+
+  const tempFile = `${BRAIN_POSTURE_FILE}.${process.pid}.${Date.now()}.tmp`;
+  const serialized = `${JSON.stringify(validated, null, 2)}\n`;
+
+  try {
+    fs.writeFileSync(tempFile, serialized, { encoding: "utf8" });
+  } catch (cause) {
+    removeTempFileQuietly(tempFile);
+    throw new BrainPostureWriteError(
+      `Failed to write temporary brain posture file at ${tempFile}.`,
+      { cause },
+    );
+  }
+
+  try {
+    fs.renameSync(tempFile, BRAIN_POSTURE_FILE);
+  } catch (cause) {
+    removeTempFileQuietly(tempFile);
+    throw new BrainPostureWriteError(
+      `Failed to atomically rename brain posture file onto ${BRAIN_POSTURE_FILE}.`,
+      { cause },
+    );
+  }
+}
+
+function removeTempFileQuietly(tempFile: string): void {
+  try {
+    if (fs.existsSync(tempFile)) {
+      fs.unlinkSync(tempFile);
+    }
+  } catch {
+    // Best-effort cleanup; the primary write failure is what the caller needs.
+  }
 }
 
 function validateSnapshot(value: unknown): BrainPostureSnapshot {
