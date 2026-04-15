@@ -83,9 +83,6 @@ export function ObservatoryBoard({ snapshot }: ObservatoryBoardProps) {
           <p className="text-xs uppercase tracking-[0.22em] text-cyan-700">Brain and recovery posture</p>
           <div className="mt-4 space-y-3 text-sm text-slate-700">
             <div className="rounded-[22px] border border-cyan-100 bg-white/90 px-4 py-3">
-              Brain: {snapshot.brainStatus.posture}
-            </div>
-            <div className="rounded-[22px] border border-cyan-100 bg-white/90 px-4 py-3">
               Context: {snapshot.brainStatus.memorySignal}
             </div>
             <div className="rounded-[22px] border border-cyan-100 bg-white/90 px-4 py-3">
