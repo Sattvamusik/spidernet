@@ -1,0 +1,16 @@
+{
+  "missionId": "setu-current-mission",
+  "title": "Setu bridge evolution",
+  "projectClass": "setu-core",
+  "state": "active",
+  "lastVerifiedMilestone": "",
+  "currentRoute": "",
+  "activeSpecialist": "",
+  "pendingHumanDecision": "",
+  "blockedBy": [],
+  "nextActions": [],
+  "freezeStatus": "none",
+  "mirrorStatus": "pending",
+  "recoveryStatus": "pending",
+  "ftdLinks": []
+}
