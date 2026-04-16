@@ -1,0 +1,24 @@
+Resume from .handoff/ in /home/sattv/projects/spidernet-control-deck.
+
+Source of truth order:
+1. repo filesystem
+2. .handoff/manifest.json
+3. .handoff/00-current-state.md
+4. .handoff/01-decisions.md
+5. .handoff/02-open-loops.md
+6. .handoff/05-repo-facts.txt
+7. git history
+8. chat only if consistent with the above
+
+Rules:
+- Do not restart discovery
+- Do not reopen settled decisions
+- Treat committed + handoff-refreshed milestones as frozen unless explicitly reopened
+- Ask all blocking questions in one grouped message only
+- Stop before commit unless explicitly told
+
+First, summarize:
+1. current verified state
+2. locked decisions
+3. open loops
+4. safest next step

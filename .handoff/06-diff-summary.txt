@@ -3,8 +3,11 @@
  M .handoff/05-repo-facts.txt
  M .handoff/06-diff-summary.txt
  M tsconfig.tsbuildinfo
+?? .handoff/08-next-thread-prompt.txt
+?? scripts/close_phase.sh
 
 === latest commits ===
+3f560a7 Handoff: refresh after Brain Phase 2d admin posture route
 2d6216e Brain v2: add Phase 2d admin posture route
 0a67ae3 Handoff: refresh after Setu operator bay design
 e2fac21 Architecture: define Setu operator bay
@@ -12,4 +15,3 @@ e2fac21 Architecture: define Setu operator bay
 b4cd747 Architecture: define Brain Phase 2d admin routecd
 037c786 Handoff: refresh after Brain Phase 2c setTierPosture wiring
 2395e60 Handoff: refresh after Brain Phase 2c setTierPosture wiring
-c56e051 Brain v2: wire setTierPosture to write and ledger emit
