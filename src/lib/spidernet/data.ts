@@ -199,6 +199,12 @@ export function getDashboardSnapshot(): DashboardSnapshot {
   const runtime = loadRuntimeStorage();
   const continuityStatus = buildContinuityStatus();
   const brainStatus = buildBrainStatus(runtime);
+  const brainSignals = {
+    memorySignal: brainStatus.memorySignal,
+    localLaneSignal: brainStatus.localLaneSignal,
+    ollamaSignal: brainStatus.ollamaSignal,
+    note: brainStatus.note,
+  };
   const brainPosture = loadPosture();
 
   const intakePackets = runtime.intakePackets.map(safePacket);
@@ -475,6 +481,7 @@ export function getDashboardSnapshot(): DashboardSnapshot {
     packets,
     policyDecisions,
     brainStatus,
+    brainSignals,
     brainPosture,
     continuityStatus,
     packetTemplates,

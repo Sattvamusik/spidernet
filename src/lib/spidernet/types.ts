@@ -383,6 +383,12 @@ export type DashboardSnapshot = {
   policyDecisions: RoutingDecision[];
   managerSynthesis: ManagerSynthesis;
   brainStatus: BrainStatus;
+  brainSignals: {
+    memorySignal: string;
+    localLaneSignal: string;
+    ollamaSignal: string;
+    note: string;
+  };
   brainPosture?: BrainPostureSnapshot;
   continuityStatus: ContinuityStatus;
   readinessGates: ReadinessGate[];
