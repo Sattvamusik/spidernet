@@ -3,20 +3,20 @@
   "code_repo": "/home/sattv/projects/spidernet-control-deck",
   "context_workspace": "/home/sattv/SpiderNet_Control/08_HIVE/DRISHTI",
   "branch": "fix/setu-storage-data-contract-001",
-  "latest_commit": "037c786",
+  "latest_commit": "b4cd747",
   "verified": {
     "lint": true,
     "tsc_no_emit": true,
     "build": true
   },
   "scope_lock": {
-    "brain_mode": "write_path_internal_only",
-    "setTierPosture": "implemented_no_caller",
+    "brain_v1_mode": "read_only",
+    "setTierPosture": false,
     "touch_brain_manager": false,
     "touch_intake": false,
     "touch_mission": false,
     "touch_ollama": false,
     "touch_specialist_registry": false
   },
-  "next_step": "design Phase 2d — first real caller of setTierPosture (probe loop, admin route, or probe API)"
+  "next_step": "maintain handoff bundle and decide controlled cleanup vs next architecture phase"
 }
