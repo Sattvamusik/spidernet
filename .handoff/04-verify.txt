@@ -1,11 +1,12 @@
-Last known verification:
+Last known verification (HEAD 037c786):
 - npm run lint ✅
 - npx tsc --noEmit ✅
 - npm run build ✅
 
 Latest verified commit context:
-- e8408ee
-- e5e735f
-- 33096fb
+- ca9cf46 (Phase 2a — write primitive)
+- 1bf8a8b (Phase 2b — ledger emitter)
+- c56e051 (Phase 2c — setTierPosture wiring)
+- 037c786 (handoff refresh)
 
-Generated at: 2026-04-16T05:32:03+05:30
+Generated at: 2026-04-16T06:10:00+05:30

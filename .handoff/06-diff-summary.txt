@@ -1,11 +1,15 @@
 === git status --short ===
+ M next-env.d.ts
+ M tsconfig.tsbuildinfo
+ M .handoff/00-current-state.md
+ M .handoff/02-open-loops.md
  M .handoff/04-verify.txt
  M .handoff/05-repo-facts.txt
  M .handoff/06-diff-summary.txt
- M next-env.d.ts
- M tsconfig.tsbuildinfo
+ M .handoff/manifest.json
 
 === latest commits ===
+037c786 Handoff: refresh after Brain Phase 2c setTierPosture wiring
 2395e60 Handoff: refresh after Brain Phase 2c setTierPosture wiring
 c56e051 Brain v2: wire setTierPosture to write and ledger emit
 86c0121 Handoff: refresh after Brain Phase 2b ledger emitter code commit
@@ -13,4 +17,3 @@ c56e051 Brain v2: wire setTierPosture to write and ledger emit
 23023ea Handoff: refresh after Brain Phase 2b ledger emitter
 4538d75 Handoff: refresh after Brain Phase 2a write primitive
 ca9cf46 Brain v2: add atomic posture write primitive
-4b76313 Handoff: refresh after Brain write-path design
