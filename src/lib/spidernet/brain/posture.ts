@@ -1,6 +1,9 @@
 import { createHash } from "crypto";
 
-import { emitPostureChangeEvent } from "./events";
+import {
+  emitPostureChangeEvent,
+  type BrainPostureLedgerEvent,
+} from "./events";
 import {
   BrainPostureWriteError,
   readPostureFile,
@@ -55,15 +58,26 @@ export function setTierPosture(
 
   writePostureFile(next);
 
-  emitPostureChangeEvent({
-    id: idempotencyKey(tier, update.status, update.note, timestamp),
-    actor: "brain-posture",
-    action: "brain.posture.tier.updated",
-    scope: `brain:${tier}:${update.status}`,
-    timestamp,
-  });
+  emitPostureChangeEvent(
+    buildPostureEvent(tier, update.status, update.note, timestamp),
+  );
 
   return next;
+}
+
+export function buildPostureEvent(
+  tier: BrainTier,
+  status: BrainPostureStatus,
+  note: string,
+  timestamp: string,
+): BrainPostureLedgerEvent {
+  return {
+    id: idempotencyKey(tier, status, note, timestamp),
+    actor: "brain-posture",
+    action: "brain.posture.tier.updated",
+    scope: `brain:${tier}:${status}`,
+    timestamp,
+  };
 }
 
 function idempotencyKey(
