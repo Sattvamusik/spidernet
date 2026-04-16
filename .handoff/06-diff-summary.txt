@@ -1,16 +1,14 @@
 === git status --short ===
- M .handoff/00-current-state.md
- M .handoff/02-open-loops.md
  M .handoff/04-verify.txt
  M .handoff/05-repo-facts.txt
  M .handoff/06-diff-summary.txt
 
 === latest commits ===
+e2fac21 Architecture: define Setu operator bay
+3282d61 Handoff: refresh after Brain Phase 2d admin route design
 b4cd747 Architecture: define Brain Phase 2d admin routecd
 037c786 Handoff: refresh after Brain Phase 2c setTierPosture wiring
 2395e60 Handoff: refresh after Brain Phase 2c setTierPosture wiring
 c56e051 Brain v2: wire setTierPosture to write and ledger emit
 86c0121 Handoff: refresh after Brain Phase 2b ledger emitter code commit
 1bf8a8b Brain v2: add posture change ledger emitter
-23023ea Handoff: refresh after Brain Phase 2b ledger emitter
-4538d75 Handoff: refresh after Brain Phase 2a write primitive

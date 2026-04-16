@@ -3,7 +3,7 @@
   "code_repo": "/home/sattv/projects/spidernet-control-deck",
   "context_workspace": "/home/sattv/SpiderNet_Control/08_HIVE/DRISHTI",
   "branch": "fix/setu-storage-data-contract-001",
-  "latest_commit": "b4cd747",
+  "latest_commit": "e2fac21",
   "verified": {
     "lint": true,
     "tsc_no_emit": true,
