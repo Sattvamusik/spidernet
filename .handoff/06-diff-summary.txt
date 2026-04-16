@@ -6,6 +6,7 @@
  M tsconfig.tsbuildinfo
 
 === latest commits ===
+2395e60 Handoff: refresh after Brain Phase 2c setTierPosture wiring
 c56e051 Brain v2: wire setTierPosture to write and ledger emit
 86c0121 Handoff: refresh after Brain Phase 2b ledger emitter code commit
 1bf8a8b Brain v2: add posture change ledger emitter
@@ -13,4 +14,3 @@ c56e051 Brain v2: wire setTierPosture to write and ledger emit
 4538d75 Handoff: refresh after Brain Phase 2a write primitive
 ca9cf46 Brain v2: add atomic posture write primitive
 4b76313 Handoff: refresh after Brain write-path design
-67574f8 Architecture: define Brain write-path and ledger design
