@@ -5,11 +5,11 @@
  M tsconfig.tsbuildinfo
 
 === latest commits ===
+73bbdce Brain v2: Phase 2d-2 confine brainStatus to compatibility summary
+81027e8 Scripts: add handoff dump for chat-only threads
+ec14452 Scripts: make close_phase use latest non-handoff milestone
+db4492a Handoff: refresh after Handoff: refresh after cat /home/sattv/projects/spidernet-control-deck/.handoff/08-next-thread-prompt.txt
 8d0bfaf Handoff: refresh after cat /home/sattv/projects/spidernet-control-deck/.handoff/08-next-thread-prompt.txt
 9fe5579 Scripts: auto-suggest milestone name in close_phase
 1b75e97 Scripts: add close_phase helper
 ba4044c Handoff: refresh after Brain Phase 2d-1 admin route
-3f560a7 Handoff: refresh after Brain Phase 2d admin posture route
-2d6216e Brain v2: add Phase 2d admin posture route
-0a67ae3 Handoff: refresh after Setu operator bay design
-e2fac21 Architecture: define Setu operator bay

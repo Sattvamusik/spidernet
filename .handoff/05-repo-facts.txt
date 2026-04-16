@@ -1,5 +1,5 @@
 CODE_REPO=/home/sattv/projects/spidernet-control-deck
 CONTEXT_WORKSPACE=/home/sattv/SpiderNet_Control/08_HIVE/DRISHTI
 BRANCH=fix/setu-storage-data-contract-001
-HEAD_COMMIT=8d0bfaf
-GENERATED_AT=2026-04-16T14:41:04+05:30
+HEAD_COMMIT=73bbdce
+GENERATED_AT=2026-04-16T15:46:51+05:30
