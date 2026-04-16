@@ -13,14 +13,11 @@ echo "=== Current repo state ==="
 git log --oneline -6
 echo
 git status --short
-
 echo
-read -rp "Milestone name for handoff commit: " MILESTONE
 
-if [ -z "${MILESTONE}" ]; then
-  echo "Milestone name cannot be empty."
-  exit 1
-fi
+DEFAULT_MILESTONE="$(git log -1 --pretty=%s)"
+read -rp "Milestone name for handoff commit [${DEFAULT_MILESTONE}]: " MILESTONE
+MILESTONE="${MILESTONE:-$DEFAULT_MILESTONE}"
 
 git add .handoff
 git commit -m "Handoff: refresh after ${MILESTONE}"
