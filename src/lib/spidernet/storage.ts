@@ -236,6 +236,13 @@ export function appendLedgerEvent(event: LedgerEventRecord | Record<string, unkn
   return appendJsonArrayItem<Record<string, unknown>>(RUNTIME_PATHS.ledgerEvents, event);
 }
 
+export function upsertVaultEntry(key: string, value: Record<string, unknown>) {
+  const current = ensureRecord(readJsonFile<Record<string, unknown>>(RUNTIME_PATHS.vaultIndex, {}));
+  current[key] = value;
+  writeJsonFile(RUNTIME_PATHS.vaultIndex, current);
+  return current;
+}
+
 export function createDash001IntakePacket(input?: {
   objective?: string;
   body?: string;

@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { randomUUID } from "crypto";
 
 import { evaluateRoutingDecision } from "@/lib/spidernet/policy";
 import {
@@ -12,6 +13,7 @@ import {
   writeJsonAtomic,
   type CompactIngestPacket,
 } from "@/lib/spidernet/ingest";
+import { appendLedgerEvent, upsertVaultEntry, type LedgerEventRecord } from "@/lib/spidernet/storage";
 import type { BoardId, IntakePacket, RoutingDecision } from "@/lib/spidernet/types";
 
 export type RouteDecisionRecord = RoutingDecision & {
@@ -122,7 +124,47 @@ export function filter(packet: CompactIngestPacket): FilterResult {
     vaultTargets: decision.vaultTargets,
   });
 
+  if (decision.executionAllowed) {
+    persistAcceptedRoute(packet, decision);
+  }
+
   return { decision, routeRef, cacheHit: false };
+}
+
+function persistAcceptedRoute(
+  packet: CompactIngestPacket,
+  decision: RouteDecisionRecord,
+) {
+  const ledgerEventId = `evt-${randomUUID().slice(0, 12)}`;
+  const ledgerEvent: LedgerEventRecord = {
+    eventId: ledgerEventId,
+    type: "packet.routed.accepted",
+    packetId: packet.hash,
+    detail: `Routed to ${decision.boardId} via ${decision.lane} lane (${decision.exposureDecision}).`,
+    createdAt: decision.decidedAt,
+  };
+  appendLedgerEvent(ledgerEvent);
+
+  const primaryRoute = decision.routeFamilies[0];
+  let vaultWritten = false;
+  if (primaryRoute) {
+    upsertVaultEntry(packet.hash, {
+      id: packet.hash,
+      route: primaryRoute,
+      title: packet.objectivePreview || `Ingest ${packet.hash.slice(0, 8)}`,
+      summary: `${decision.boardId} · ${decision.lane} · ${decision.exposureDecision}`,
+      sourcePacketId: packet.hash,
+      status: "live",
+      updatedAt: decision.decidedAt,
+    });
+    vaultWritten = true;
+  }
+
+  logStage("memory_feed_written", {
+    hash: packet.hash,
+    ledgerEventId,
+    vaultWritten,
+  });
 }
 
 export function reuseRoute(hash: string): FilterResult | null {
