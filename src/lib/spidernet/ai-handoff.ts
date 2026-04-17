@@ -8,6 +8,13 @@ import {
   readCompactPacket,
   writeJsonAtomic,
 } from "@/lib/spidernet/ingest";
+import {
+  AiProviderError,
+  getCurrentTarget,
+  sendToProvider,
+  type AiProviderErrorKind,
+  type AiProviderTarget,
+} from "@/lib/spidernet/ai-providers";
 
 const BASE = path.join(process.cwd(), "artifacts/runtime/spidernet/handoffs");
 
@@ -41,15 +48,29 @@ export type AIHandoffPayloadV1 = {
   tokenEstimate: number;
 };
 
+export type HandoffAttemptResponse = {
+  text: string | null;
+  model: string | null;
+  usage: unknown;
+  stopReason: string | null;
+};
+
+export type HandoffAttemptError = {
+  kind: AiProviderErrorKind;
+  name: string;
+  message: string;
+};
+
 export type HandoffAttempt = {
   handoffId: string;
   packetId: string;
   sourceHash: string;
   kind: HandoffDispatchedPacket["kind"];
   context: AIHandoffPayloadV1;
-  target: "stub";
-  status: "stub_sent";
-  response: null;
+  target: AiProviderTarget;
+  status: "sent" | "stub_sent" | "error";
+  response: HandoffAttemptResponse | null;
+  error?: HandoffAttemptError;
   sentAt: string;
 };
 
@@ -96,6 +117,26 @@ function buildCompactContext(
   };
 }
 
+function attemptFilePath(packetId: string): string {
+  return path.join(HANDOFF_PATHS.attemptsDir, `${packetId}.json`);
+}
+
+function writeAttempt(attempt: HandoffAttempt): void {
+  ensureDir(HANDOFF_PATHS.attemptsDir);
+  writeJsonAtomic(attemptFilePath(attempt.packetId), attempt);
+}
+
+function updateSentIndex(
+  index: HandoffIndex,
+  packetId: string,
+  handoffId: string,
+  sentAt: string,
+): void {
+  index[packetId] = { handoffId, sentAt };
+  ensureDir(HANDOFF_PATHS.base);
+  writeJsonAtomic(HANDOFF_PATHS.sentIndex, index);
+}
+
 export async function attemptHandoff(
   packet: HandoffDispatchedPacket,
   sourceHash: string,
@@ -114,32 +155,67 @@ export async function attemptHandoff(
   const sentAt = new Date().toISOString();
   const context = buildCompactContext(packet, sourceHash);
 
-  const attempt: HandoffAttempt = {
-    handoffId,
-    packetId: packet.packetId,
-    sourceHash,
-    kind: packet.kind,
-    context,
-    target: "stub",
-    status: "stub_sent",
-    response: null,
-    sentAt,
-  };
-
-  ensureDir(HANDOFF_PATHS.attemptsDir);
-  writeJsonAtomic(path.join(HANDOFF_PATHS.attemptsDir, `${packet.packetId}.json`), attempt);
-
-  index[packet.packetId] = { handoffId, sentAt };
-  ensureDir(HANDOFF_PATHS.base);
-  writeJsonAtomic(HANDOFF_PATHS.sentIndex, index);
-
-  logStage("ai_handoff_attempted", {
-    handoffId,
-    packetId: packet.packetId,
-    kind: packet.kind,
-    hash: sourceHash,
-    status: "stub_sent",
-  });
-
-  return { duplicate: false, attempt };
+  try {
+    const providerResponse = await sendToProvider(context);
+    const attempt: HandoffAttempt = {
+      handoffId,
+      packetId: packet.packetId,
+      sourceHash,
+      kind: packet.kind,
+      context,
+      target: providerResponse.target,
+      status: providerResponse.status,
+      response: {
+        text: providerResponse.text,
+        model: providerResponse.model,
+        usage: providerResponse.usage,
+        stopReason: providerResponse.stopReason,
+      },
+      sentAt,
+    };
+    writeAttempt(attempt);
+    updateSentIndex(index, packet.packetId, handoffId, sentAt);
+    logStage("ai_handoff_attempted", {
+      handoffId,
+      packetId: packet.packetId,
+      kind: packet.kind,
+      hash: sourceHash,
+      target: providerResponse.target,
+      status: providerResponse.status,
+    });
+    return { duplicate: false, attempt };
+  } catch (err) {
+    const target: AiProviderTarget =
+      err instanceof AiProviderError ? err.target : getCurrentTarget();
+    const kind: AiProviderErrorKind =
+      err instanceof AiProviderError ? err.kind : "permanent";
+    const errorRecord: HandoffAttemptError = {
+      kind,
+      name: err instanceof Error ? err.name : "Error",
+      message: err instanceof Error ? err.message : String(err),
+    };
+    const attempt: HandoffAttempt = {
+      handoffId,
+      packetId: packet.packetId,
+      sourceHash,
+      kind: packet.kind,
+      context,
+      target,
+      status: "error",
+      response: null,
+      error: errorRecord,
+      sentAt,
+    };
+    writeAttempt(attempt);
+    logStage("ai_handoff_failed", {
+      handoffId,
+      packetId: packet.packetId,
+      kind: packet.kind,
+      hash: sourceHash,
+      target,
+      errorKind: kind,
+      errorMessage: errorRecord.message,
+    });
+    return { duplicate: false, attempt };
+  }
 }
