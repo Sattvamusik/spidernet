@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { filter, reuseRoute } from "@/lib/spidernet/filtration";
 import { ingest } from "@/lib/spidernet/ingest";
 import { appendLedgerEvent, appendPacket } from "@/lib/spidernet/storage";
 
@@ -29,13 +30,17 @@ export async function POST(req: Request) {
     const ingestResult = ingest({ body: input, source: "api/packet" });
 
     if (ingestResult.duplicate) {
+      const cached = reuseRoute(ingestResult.packet.hash);
       return NextResponse.json({
         success: true,
         duplicate: true,
         hitCount: ingestResult.hitCount,
         ingest: ingestResult.packet,
+        route: cached?.decision ?? null,
       });
     }
+
+    const filterResult = filter(ingestResult.packet);
 
     const packet = {
       id: `pkt_${ingestResult.packet.hash.slice(0, 12)}`,
@@ -58,7 +63,12 @@ export async function POST(req: Request) {
       created_at: packet.created_at,
     });
 
-    return NextResponse.json({ success: true, duplicate: false, packet });
+    return NextResponse.json({
+      success: true,
+      duplicate: false,
+      packet,
+      route: filterResult.decision,
+    });
   } catch (error) {
     return NextResponse.json(
       {

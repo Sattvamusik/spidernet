@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { randomUUID } from "crypto";
 import { runCodingFlow } from "@/lib/spidernet/coding-flow";
+import { filter, reuseRoute } from "@/lib/spidernet/filtration";
 import { ingest } from "@/lib/spidernet/ingest";
 import { appendLedgerEvent, createDash001IntakePacket, type LedgerEventRecord } from "@/lib/spidernet/storage";
 
@@ -18,6 +19,7 @@ export async function POST(request: Request) {
   });
 
   if (ingestResult.duplicate) {
+    reuseRoute(ingestResult.packet.hash);
     const dupEvent: LedgerEventRecord = {
       eventId: `evt-${randomUUID().slice(0, 12)}`,
       type: "intake_duplicate_cache_hit",
@@ -28,6 +30,8 @@ export async function POST(request: Request) {
     appendLedgerEvent(dupEvent);
     return NextResponse.redirect(new URL("/boards/input-data", request.url), 303);
   }
+
+  filter(ingestResult.packet);
 
   const codingFlow = runCodingFlow({
     actor: "white-web-setu",

@@ -8,6 +8,7 @@ export const INGEST_PATHS = {
   base: BASE,
   rawDir: path.join(BASE, "raw"),
   packetDir: path.join(BASE, "packets"),
+  routeDir: path.join(BASE, "routes"),
   seenIndex: path.join(BASE, "seen.json"),
   stageLog: path.join(BASE, "stages.log"),
 } as const;
@@ -28,6 +29,7 @@ export type CompactIngestPacket = {
   byteCount: number;
   tokenEstimate: number;
   rawRef: string | null;
+  routeRef?: string | null;
 };
 
 export type SeenEntry = {
@@ -37,6 +39,7 @@ export type SeenEntry = {
   hitCount: number;
   packetRef: string;
   rawRef: string | null;
+  routeRef?: string | null;
 };
 
 export type IngestResult = {
@@ -80,7 +83,10 @@ function hashInput(objective: string, body: string): string {
   return createHash("sha256").update(`${objective}\n${body}`, "utf8").digest("hex");
 }
 
-function logStage(stage: string, fields: Record<string, string | number | boolean>) {
+export function logStage(
+  stage: string,
+  fields: Record<string, string | number | boolean | string[] | null | undefined>,
+) {
   const entry = { ts: new Date().toISOString(), stage, ...fields };
   const line = JSON.stringify(entry);
   try {
@@ -91,6 +97,31 @@ function logStage(stage: string, fields: Record<string, string | number | boolea
   }
   console.info("[spidernet]ingest", line);
 }
+
+export function readCompactPacket(hash: string): CompactIngestPacket | null {
+  const packetRef = path.join(INGEST_PATHS.packetDir, `${hash}.json`);
+  try {
+    return JSON.parse(fs.readFileSync(packetRef, "utf8")) as CompactIngestPacket;
+  } catch {
+    return null;
+  }
+}
+
+export function readSeenEntry(hash: string): SeenEntry | null {
+  const seen = readSeenIndex();
+  return seen[hash] ?? null;
+}
+
+export function updateSeenRouteRef(hash: string, routeRef: string | null) {
+  const seen = readSeenIndex();
+  const entry = seen[hash];
+  if (!entry) return;
+  entry.routeRef = routeRef;
+  seen[hash] = entry;
+  writeJsonAtomic(INGEST_PATHS.seenIndex, seen);
+}
+
+export { writeJsonAtomic, ensureDir };
 
 export function ingest(input: IngestInput): IngestResult {
   const objective = normalize(input.objective);
