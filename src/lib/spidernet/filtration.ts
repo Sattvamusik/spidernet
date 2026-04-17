@@ -88,7 +88,7 @@ function routeRefPath(hash: string): string {
   return path.join(INGEST_PATHS.routeDir, `${hash}.json`);
 }
 
-export function filter(packet: CompactIngestPacket): FilterResult {
+export async function filter(packet: CompactIngestPacket): Promise<FilterResult> {
   const routeRef = routeRefPath(packet.hash);
   const classifications = classify(packet);
   logStage("classified", {
@@ -126,13 +126,13 @@ export function filter(packet: CompactIngestPacket): FilterResult {
   });
 
   if (decision.executionAllowed) {
-    persistAcceptedRoute(packet, decision);
+    await persistAcceptedRoute(packet, decision);
   }
 
   return { decision, routeRef, cacheHit: false };
 }
 
-function persistAcceptedRoute(
+async function persistAcceptedRoute(
   packet: CompactIngestPacket,
   decision: RouteDecisionRecord,
 ) {
@@ -167,7 +167,7 @@ function persistAcceptedRoute(
     vaultWritten,
   });
 
-  seedWorkflow(packet, decision);
+  await seedWorkflow(packet, decision);
 }
 
 export function reuseRoute(hash: string): FilterResult | null {
@@ -187,7 +187,7 @@ export function reuseRoute(hash: string): FilterResult | null {
   return { decision, routeRef: entry.routeRef, cacheHit: true };
 }
 
-export function filterFromHash(hash: string): FilterResult | null {
+export async function filterFromHash(hash: string): Promise<FilterResult | null> {
   const packet = readCompactPacket(hash);
   if (!packet) return null;
   return filter(packet);

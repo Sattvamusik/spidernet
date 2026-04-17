@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     return NextResponse.redirect(new URL("/boards/input-data", request.url), 303);
   }
 
-  filter(ingestResult.packet);
+  await filter(ingestResult.packet);
 
   const codingFlow = runCodingFlow({
     actor: "white-web-setu",

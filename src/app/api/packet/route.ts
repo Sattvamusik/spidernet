@@ -40,7 +40,7 @@ export async function POST(req: Request) {
       });
     }
 
-    const filterResult = filter(ingestResult.packet);
+    const filterResult = await filter(ingestResult.packet);
 
     const packet = {
       id: `pkt_${ingestResult.packet.hash.slice(0, 12)}`,

@@ -60,10 +60,10 @@ function seedRefPath(hash: string): string {
   return path.join(FTD_PATHS.seedsDir, `${hash}.json`);
 }
 
-export function seedWorkflow(
+export async function seedWorkflow(
   packet: CompactIngestPacket,
   decision: RouteDecisionRecord,
-): SeedWorkflowResult {
+): Promise<SeedWorkflowResult> {
   const seedRef = seedRefPath(packet.hash);
   const nextStage = pickNextStage(decision.boardId);
   const seed: WorkflowSeed = {
@@ -89,7 +89,7 @@ export function seedWorkflow(
     seedRef,
   });
 
-  dispatchSeed(seed);
+  await dispatchSeed(seed);
 
   return { seed, seedRef };
 }
@@ -160,7 +160,7 @@ function composeDispatchRecord(
   };
 }
 
-export function dispatchSeed(seed: WorkflowSeed): DispatchResult {
+export async function dispatchSeed(seed: WorkflowSeed): Promise<DispatchResult> {
   const index = readDispatchedIndex();
   const existing = index[seed.sourceHash];
   if (existing) {
@@ -205,7 +205,7 @@ export function dispatchSeed(seed: WorkflowSeed): DispatchResult {
     packetId,
   });
 
-  attemptHandoff(
+  await attemptHandoff(
     {
       packetId,
       kind: packetKind,

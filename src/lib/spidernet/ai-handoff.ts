@@ -27,7 +27,7 @@ export type HandoffDispatchedPacket = {
   vaultTargets: string[];
 };
 
-export type HandoffCompactContext = {
+export type AIHandoffPayloadV1 = {
   packetId: string;
   sourceHash: string;
   kind: HandoffDispatchedPacket["kind"];
@@ -46,7 +46,7 @@ export type HandoffAttempt = {
   packetId: string;
   sourceHash: string;
   kind: HandoffDispatchedPacket["kind"];
-  context: HandoffCompactContext;
+  context: AIHandoffPayloadV1;
   target: "stub";
   status: "stub_sent";
   response: null;
@@ -79,7 +79,7 @@ function readHandoffIndex(): HandoffIndex {
 function buildCompactContext(
   packet: HandoffDispatchedPacket,
   sourceHash: string,
-): HandoffCompactContext {
+): AIHandoffPayloadV1 {
   const compact = readCompactPacket(sourceHash);
   return {
     packetId: packet.packetId,
@@ -96,10 +96,10 @@ function buildCompactContext(
   };
 }
 
-export function attemptHandoff(
+export async function attemptHandoff(
   packet: HandoffDispatchedPacket,
   sourceHash: string,
-): HandoffResult {
+): Promise<HandoffResult> {
   const index = readHandoffIndex();
   const existing = index[packet.packetId];
   if (existing) {
