@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 
-import type { BrainStatus, ContinuityStatus, DashboardSnapshot, ManagerSynthesis } from "./types";
+import type { ContinuityStatus, DashboardSnapshot, ManagerSynthesis } from "./types";
 import { loadRuntimeStorage } from "./storage";
 import { loadPosture } from "./brain/posture";
 
@@ -74,6 +74,9 @@ function buildContinuityStatus(): ContinuityStatus {
   const recoveryCheckpoints = countFilesRecursive(path.join(RECOVERY_ROOT, "checkpoints"));
   const recoveryRestorePlans = countFilesRecursive(path.join(RECOVERY_ROOT, "restore-plans"));
 
+  const phaseInventory = safeReadFile(path.join(RUNTIME_INVENTORY_ROOT, "spidernet_phase1_inventory.md"));
+  const noAutoFailover = phaseInventory.includes("does not switch live providers automatically");
+
   return {
     freeze:
       verifiedFreezeDirectories.length > 0
@@ -110,30 +113,7 @@ function buildContinuityStatus(): ContinuityStatus {
             status: "empty",
             detail: "Recovery folders exist, but no checkpoints or restore plans are recorded yet.",
           },
-  };
-}
-
-function buildBrainStatus(runtime: ReturnType<typeof loadRuntimeStorage>): BrainStatus {
-  const localLaneInventory = safeReadFile(path.join(RUNTIME_INVENTORY_ROOT, "local_coding_lane_inventory.md"));
-  const phaseInventory = safeReadFile(path.join(RUNTIME_INVENTORY_ROOT, "spidernet_phase1_inventory.md"));
-
-  const policyOnlyBrain = phaseInventory.includes("Brain manager is policy logic only");
-  const localLaneInventoried = localLaneInventory.includes("scripts/spidernet-local-code-start.sh");
-  const ollamaReachabilityInventoried = localLaneInventory.includes("Ollama endpoint reachable");
-  const noAutoFailover = phaseInventory.includes("does not switch live providers automatically");
-
-  return {
-    posture: policyOnlyBrain
-      ? "Brain selection is wired as policy logic, not as a live provider runtime."
-      : "Brain posture is not fully described in the current inventory.",
-    memorySignal: `${runtime.ledgerEvents.length} ledger events and ${runtime.vaultEntries.length} vault entries are available for bridge-deck context.`,
-    localLaneSignal: localLaneInventoried
-      ? ollamaReachabilityInventoried
-        ? "Local coding lane inventory lists repo-local helpers and Ollama reachability."
-        : "Local coding lane helpers are inventoried, but Ollama reachability is not confirmed in runtime data."
-      : "Local coding lane inventory is not present.",
-    ollamaSignal: `Ollama handshake is ${runtime.ollamaConfig.handshakeStatus} at ${runtime.ollamaConfig.endpoint}. ${runtime.ollamaConfig.note}`,
-    note: noAutoFailover
+    guardrailNote: noAutoFailover
       ? "Inventory still marks automatic failover as bridge logic, not final truth."
       : "Treat this as runtime posture only, not proof of live multi-provider execution.",
   };
@@ -226,13 +206,6 @@ function buildManagerSynthesis(
 export function getDashboardSnapshot(): DashboardSnapshot {
   const runtime = loadRuntimeStorage();
   const continuityStatus = buildContinuityStatus();
-  const brainStatus = buildBrainStatus(runtime);
-  const brainSignals = {
-    memorySignal: brainStatus.memorySignal,
-    localLaneSignal: brainStatus.localLaneSignal,
-    ollamaSignal: brainStatus.ollamaSignal,
-    note: brainStatus.note,
-  };
   const brainPosture = loadPosture();
 
   const intakePackets = runtime.intakePackets.map(safePacket);
@@ -508,8 +481,6 @@ export function getDashboardSnapshot(): DashboardSnapshot {
 
     packets,
     policyDecisions,
-    brainStatus,
-    brainSignals,
     brainPosture,
     continuityStatus,
     packetTemplates,

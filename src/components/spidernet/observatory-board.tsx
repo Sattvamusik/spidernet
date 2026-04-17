@@ -83,13 +83,7 @@ export function ObservatoryBoard({ snapshot }: ObservatoryBoardProps) {
           <p className="text-xs uppercase tracking-[0.22em] text-cyan-700">Brain and recovery posture</p>
           <div className="mt-4 space-y-3 text-sm text-slate-700">
             <div className="rounded-[22px] border border-cyan-100 bg-white/90 px-4 py-3">
-              Context: {snapshot.brainSignals.memorySignal}
-            </div>
-            <div className="rounded-[22px] border border-cyan-100 bg-white/90 px-4 py-3">
-              Local lane: {snapshot.brainSignals.localLaneSignal}
-            </div>
-            <div className="rounded-[22px] border border-cyan-100 bg-white/90 px-4 py-3">
-              Ollama: {snapshot.brainSignals.ollamaSignal}
+              Ollama: Ollama handshake is {snapshot.ollamaConfig.handshakeStatus} at {snapshot.ollamaConfig.endpoint}. {snapshot.ollamaConfig.note}
             </div>
             <div className="rounded-[22px] border border-cyan-100 bg-white/90 px-4 py-3">
               Freeze: {snapshot.continuityStatus.freeze.detail}
@@ -101,7 +95,7 @@ export function ObservatoryBoard({ snapshot }: ObservatoryBoardProps) {
               Recovery: {snapshot.continuityStatus.recovery.detail}
             </div>
             <div className="rounded-[22px] border border-cyan-100 bg-white/90 px-4 py-3">
-              Guardrail: {snapshot.brainSignals.note}
+              Guardrail: {snapshot.continuityStatus.guardrailNote}
             </div>
             {snapshot.brainPosture ? (
               <div className="rounded-[22px] border border-cyan-100 bg-white/90 px-4 py-3">

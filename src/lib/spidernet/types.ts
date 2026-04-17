@@ -328,14 +328,6 @@ export type ManagerSynthesis = {
   activeHolds: string[];
 };
 
-export type BrainStatus = {
-  posture: string;
-  memorySignal: string;
-  localLaneSignal: string;
-  ollamaSignal: string;
-  note: string;
-};
-
 export type ContinuityStatusItem = {
   status: "verified" | "captured" | "ready" | "empty" | "missing";
   detail: string;
@@ -345,6 +337,7 @@ export type ContinuityStatus = {
   freeze: ContinuityStatusItem;
   mirror: ContinuityStatusItem;
   recovery: ContinuityStatusItem;
+  guardrailNote: string;
 };
 
 export type ObservatorySignal = {
@@ -382,13 +375,6 @@ export type DashboardSnapshot = {
   scoreMemory: ToolScoreMemory[];
   policyDecisions: RoutingDecision[];
   managerSynthesis: ManagerSynthesis;
-  brainStatus: BrainStatus;
-  brainSignals: {
-    memorySignal: string;
-    localLaneSignal: string;
-    ollamaSignal: string;
-    note: string;
-  };
   brainPosture?: BrainPostureSnapshot;
   continuityStatus: ContinuityStatus;
   readinessGates: ReadinessGate[];
