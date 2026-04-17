@@ -14,6 +14,7 @@ import {
   type CompactIngestPacket,
 } from "@/lib/spidernet/ingest";
 import { appendLedgerEvent, upsertVaultEntry, type LedgerEventRecord } from "@/lib/spidernet/storage";
+import { seedWorkflow } from "@/lib/spidernet/ftd";
 import type { BoardId, IntakePacket, RoutingDecision } from "@/lib/spidernet/types";
 
 export type RouteDecisionRecord = RoutingDecision & {
@@ -165,6 +166,8 @@ function persistAcceptedRoute(
     ledgerEventId,
     vaultWritten,
   });
+
+  seedWorkflow(packet, decision);
 }
 
 export function reuseRoute(hash: string): FilterResult | null {
