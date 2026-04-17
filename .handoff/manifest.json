@@ -3,11 +3,13 @@
   "code_repo": "/home/sattv/projects/spidernet-control-deck",
   "context_workspace": "/home/sattv/SpiderNet_Control/08_HIVE/DRISHTI",
   "branch": "fix/setu-storage-data-contract-001",
-  "latest_commit": "4d696ca",
+  "latest_commit": "62fc21e",
   "verified": {
     "lint": true,
     "tsc_no_emit": true,
-    "build": true
+    "build": true,
+    "verified_at_commit": "62fc21e",
+    "verified_at": "2026-04-18T01:48:05+05:30"
   },
   "scope_lock": {
     "brain_v1_mode": "read_only",
@@ -16,7 +18,15 @@
     "touch_intake": false,
     "touch_mission": false,
     "touch_ollama": false,
-    "touch_specialist_registry": false
+    "touch_specialist_registry": false,
+    "bridge_track_only": true,
+    "exclude_launcher": true,
+    "exclude_setu_launcher_node": true
   },
-  "next_step": "maintain handoff bundle and decide controlled cleanup vs next architecture phase"
+  "preserved_lanes": {
+    "wip/ai-handoff-provider": "stash — Bridge track; blocked on missing ai-providers.ts and dep approval",
+    "wip/launcher-button": "stash — Launcher track (NOT Bridge)",
+    "wip/handoff-refresh": "stash — superseded by this rewrite; discardable"
+  },
+  "next_step": "await scope approval per preserved lane; no new code packet until then"
 }

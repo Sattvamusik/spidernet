@@ -8,17 +8,37 @@ Source of truth order:
 5. .handoff/02-open-loops.md
 6. .handoff/05-repo-facts.txt
 7. git history
-8. chat only if consistent with the above
+8. .setu_scan/architect-status.txt, .setu_scan/FTD.list, .setu_scan/git-summary.txt
+9. chat only if consistent with the above
+
+Read these first:
+- /home/sattv/projects/spidernet-control-deck/.handoff/manifest.json
+- /home/sattv/projects/spidernet-control-deck/.handoff/00-current-state.md
+- /home/sattv/projects/spidernet-control-deck/.handoff/01-decisions.md
+- /home/sattv/projects/spidernet-control-deck/.handoff/02-open-loops.md
+- /home/sattv/projects/spidernet-control-deck/.handoff/05-repo-facts.txt
+- /home/sattv/projects/spidernet-control-deck/.setu_scan/architect-status.txt
+- /home/sattv/projects/spidernet-control-deck/.setu_scan/FTD.list
+- /home/sattv/projects/spidernet-control-deck/.setu_scan/git-summary.txt
+
+Preserved lanes (git stashes — do NOT mix; resume one at a time only after scope approval):
+- stash wip/ai-handoff-provider (Bridge track; blocked on missing ai-providers.ts + SDK dep approval)
+- stash wip/launcher-button   (Ubuntu Terminal Launcher track, NOT Bridge)
+- stash wip/handoff-refresh   (superseded by current rewrite; discardable)
 
 Rules:
 - Do not restart discovery
 - Do not reopen settled decisions
-- Treat committed + handoff-refreshed milestones as frozen unless explicitly reopened
 - Ask all blocking questions in one grouped message only
 - Stop before commit unless explicitly told
+- Compare filesystem snapshot against plan
+- Use small build packets only
+- One milestone at a time
+- SETU Bridge track = dash-004-setu-bridge pipeline only; keep separate from Launcher + setu-launcher-node
 
 First, summarize:
 1. current verified state
 2. locked decisions
 3. open loops
-4. safest next step
+4. built vs missing from filesystem snapshot
+5. safest next packet

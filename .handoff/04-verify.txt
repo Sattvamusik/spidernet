@@ -3,9 +3,14 @@ Last known verification:
 - npx tsc --noEmit ✅
 - npm run build ✅
 
-Latest verified commit context:
-- e8408ee
-- e5e735f
-- 33096fb
+Verified commit context (HEAD):
+- 62fc21e cleanup(spidernet): remove brain status compatibility bridge
+- 6bb7fcd AI Handoff v1: add controlled cached handoff from downstream packets
+- e2060e4 FTD Dispatch v1: consume workflow seeds and append downstream packet records
 
-Generated at: 2026-04-16T16:05:41+05:30
+Working tree at verification:
+- M tsconfig.tsbuildinfo (build artifact, regenerates)
+- ?? docs/architecture/setu-mine-vs-bridge.md (untracked ownership charter)
+- Preserved as stashes (not in tree): wip/handoff-refresh, wip/ai-handoff-provider, wip/launcher-button
+
+Generated at: 2026-04-18T01:48:05+05:30

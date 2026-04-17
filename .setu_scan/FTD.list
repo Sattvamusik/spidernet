@@ -1,0 +1,40 @@
+# FTD.list — future-to-do list, one item per line
+# Sources: plans/ftd.md (deck), DRISHTI/FTD.md (spec)
+# Generated at: 2026-04-18T01:48:05+05:30 from HEAD 62fc21e
+
+[HIGH] add live packet mutation flows if Dash 001..005 need in-app editing rather than read-only runtime display
+[HIGH] add a dedicated smoke or test script to package.json
+[HIGH] add authenticated action handling for approvals and decision queue updates
+[HIGH] decide whether browser automation should become a live wrapper path
+[HIGH] decide whether desktop automation should remain manual hold in the web-first product
+
+[MED] connect approval and execution packet mutation to real UI actions
+[MED] add screenshots of the updated white dashboard to artifacts/
+[MED] add route-level API handlers for runtime writes and refresh
+[MED] capture UI screenshots in artifacts/screenshots
+[MED] wire a real Ollama handshake after local endpoint confirmation
+
+[LATER] add auth model and role-aware access control
+[LATER] add CI validation and deployment runbook
+[LATER] Goose integration for outsider agent support and local agent orchestration
+[LATER] Giant local models only after workstation capacity and stability are upgraded
+[LATER] Public exposure only after auth, hardening, rate limits, and zero-trust boundaries are real
+[LATER] Advanced auth layer for admin and mutation routes
+[LATER] Autonomous multi-agent swarms only after harness, ledger, permissions, and rollback are mature
+
+[BLOCKED] no dedicated automated test script is defined yet
+
+[DRISHTI] Add durable packet persistence and append-only ledger storage instead of architectural-only packet models
+[DRISHTI] Wire the policy engine to real approval checks, dangerous-operation thresholds, and enforced route blocking
+[DRISHTI] Add live multi-tool research dispatch adapters and evidence capture for tool comparison, repo comparison, integration strategy, and interface strategy
+[DRISHTI] Add real manager submission and return flow for the core approval group
+[DRISHTI] Connect wrapper registry decisions to actual API, CLI, browser automation, desktop automation, or manual-hold execution paths
+[DRISHTI] Add real CLI wrapper build flow with command groups, tests, docs, packaging, and registry write-back
+[DRISHTI] Attach Observatory to live wrapper test status, failure clusters, permission violations, rollback verification, and system/workflow health streams
+[DRISHTI] Add runtime score-memory updates from real outcomes, including success rate, cost, latency, rework, and failure type
+[DRISHTI] Add route-specific storage backends for DNA, RUL, LIB, BLP, FTD, and templates
+[DRISHTI] Add real screenshot/upload permission handling instead of architectural placeholders only
+
+[LANE] wip/ai-handoff-provider — Bridge: real AI provider call; blocked on missing src/lib/spidernet/ai-providers.ts and on @anthropic-ai/sdk dep approval
+[LANE] wip/launcher-button — Launcher (NOT Bridge): fixed floating SETU button in src/app/layout.tsx
+[LANE] wip/handoff-refresh — superseded; discardable after acceptance

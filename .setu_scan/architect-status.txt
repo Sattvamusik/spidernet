@@ -1,0 +1,45 @@
+# Architect status — snapshot at HEAD 62fc21e — 2026-04-18T01:48:05+05:30
+
+PROJECT: spidernet-control-deck (SETU Bridge dashboard)
+BRANCH:  fix/setu-storage-data-contract-001
+HEAD:    62fc21e cleanup(spidernet): remove brain status compatibility bridge
+
+BRIDGE PIPELINE — committed at HEAD:
+  Ingest v1 → Filtration Routing v1 → Memory Feed v1
+  → FTD Workflow v1 → FTD Dispatch v1 → AI Handoff v1 (stub)
+
+BRIDGE BOARD:
+  slug: setu-bridge (dash-004-setu-bridge)
+  renderer: src/components/spidernet/specialist-task-board.tsx
+  policy routing: src/lib/spidernet/policy.ts:144 (build-class → dash-004-setu-bridge)
+  ftd stage map:  src/lib/spidernet/ftd.ts:50  (dash-004-setu-bridge → execution)
+
+OWNERSHIP SPLIT (docs/architecture/setu-mine-vs-bridge.md, untracked):
+  Ubuntu Terminal Launcher = access (open/start system)
+  SETU Bridge              = logic  (process/workflow system)
+
+VERIFIED CHECKS AT HEAD 62fc21e:
+  npm run lint     PASS
+  npx tsc --noEmit PASS
+  npm run build    PASS
+
+PRESERVED LANES (git stashes; not committed; do NOT mix):
+  wip/ai-handoff-provider  Bridge track  blocked (missing ai-providers.ts + SDK dep)
+  wip/launcher-button      Launcher      NOT Bridge
+  wip/handoff-refresh      Paperwork     superseded by current rewrite
+
+WORKING TREE RESIDUAL:
+  M tsconfig.tsbuildinfo                    (artifact, regenerates)
+  ?? docs/architecture/setu-mine-vs-bridge.md (untracked ownership charter)
+
+SCOPE LOCKS:
+  Brain v1 read-only
+  No setTierPosture
+  No brain-manager / intake / mission / ollama / specialist-registry touches
+  SETU Bridge track only (exclude Launcher and setu-launcher-node)
+
+NEXT-PACKET POLICY:
+  One milestone at a time
+  Small build packets only
+  Stop before commit unless explicitly asked
+  Resume one preserved lane at a time only after scope approval
