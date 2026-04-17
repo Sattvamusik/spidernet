@@ -1,6 +1,9 @@
-# git-summary — snapshot at HEAD 62fc21e — 2026-04-18T01:48:05+05:30
+# git-summary — snapshot at HEAD aa65587 — 2026-04-18T03:16:58+05:30
 
 ## git log --oneline -20
+aa65587 AI Handoff Provider B: add fetch-based Anthropic provider with failure taxonomy
+21ee7be AI Handoff Provider A: async refactor and rename payload to AIHandoffPayloadV1
+67b4138 Handoff: refresh resume state and record preserved lanes at 62fc21e
 62fc21e cleanup(spidernet): remove brain status compatibility bridge
 6bb7fcd AI Handoff v1: add controlled cached handoff from downstream packets
 e2060e4 FTD Dispatch v1: consume workflow seeds and append downstream packet records
@@ -18,18 +21,12 @@ db4492a Handoff: refresh after Handoff: refresh after cat /home/sattv/projects/s
 8d0bfaf Handoff: refresh after cat /home/sattv/projects/spidernet-control-deck/.handoff/08-next-thread-prompt.txt
 9fe5579 Scripts: auto-suggest milestone name in close_phase
 1b75e97 Scripts: add close_phase helper
-ba4044c Handoff: refresh after Brain Phase 2d-1 admin route
-3f560a7 Handoff: refresh after Brain Phase 2d admin posture route
-2d6216e Brain v2: add Phase 2d admin posture route
 
 ## branch
 fix/setu-storage-data-contract-001
 
 ## git status --short
  M tsconfig.tsbuildinfo
-?? docs/architecture/setu-mine-vs-bridge.md
 
 ## git stash list
-stash@{0}: On fix/setu-storage-data-contract-001: wip/handoff-refresh
-stash@{1}: On fix/setu-storage-data-contract-001: wip/ai-handoff-provider
-stash@{2}: On fix/setu-storage-data-contract-001: wip/launcher-button
+stash@{0}: On fix/setu-storage-data-contract-001: wip/launcher-button

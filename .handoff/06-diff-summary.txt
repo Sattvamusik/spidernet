@@ -1,20 +1,17 @@
 === git status --short ===
  M tsconfig.tsbuildinfo
-?? docs/architecture/setu-mine-vs-bridge.md
 
 === git stash list ===
-stash@{0}: On fix/setu-storage-data-contract-001: wip/handoff-refresh
-stash@{1}: On fix/setu-storage-data-contract-001: wip/ai-handoff-provider
-stash@{2}: On fix/setu-storage-data-contract-001: wip/launcher-button
+stash@{0}: On fix/setu-storage-data-contract-001: wip/launcher-button
 
 === latest commits ===
+aa65587 AI Handoff Provider B: add fetch-based Anthropic provider with failure taxonomy
+21ee7be AI Handoff Provider A: async refactor and rename payload to AIHandoffPayloadV1
+67b4138 Handoff: refresh resume state and record preserved lanes at 62fc21e
 62fc21e cleanup(spidernet): remove brain status compatibility bridge
 6bb7fcd AI Handoff v1: add controlled cached handoff from downstream packets
 e2060e4 FTD Dispatch v1: consume workflow seeds and append downstream packet records
 66a6676 FTD Workflow v1: seed workflows from accepted routed packets
 4549f5b Memory Feed v1: persist accepted routed packet summaries
-3374086 Filtration Routing v1: classify ingest packets and persist route decisions
-f0f4483 Ingest v1: add dedupe, raw packet split, stage log, and stabilize manager synthesis
-783419a Handoff: refresh after Setu v1 operator bay types scaffold
 
-Generated at: 2026-04-18T01:48:05+05:30
+Generated at: 2026-04-18T03:16:58+05:30

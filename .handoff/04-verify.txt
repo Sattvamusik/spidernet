@@ -4,13 +4,12 @@ Last known verification:
 - npm run build ✅
 
 Verified commit context (HEAD):
-- 62fc21e cleanup(spidernet): remove brain status compatibility bridge
-- 6bb7fcd AI Handoff v1: add controlled cached handoff from downstream packets
-- e2060e4 FTD Dispatch v1: consume workflow seeds and append downstream packet records
+- aa65587 AI Handoff Provider B: add fetch-based Anthropic provider with failure taxonomy
+- 21ee7be AI Handoff Provider A: async refactor and rename payload to AIHandoffPayloadV1
+- 67b4138 Handoff: refresh resume state and record preserved lanes at 62fc21e
 
 Working tree at verification:
 - M tsconfig.tsbuildinfo (build artifact, regenerates)
-- ?? docs/architecture/setu-mine-vs-bridge.md (untracked ownership charter)
-- Preserved as stashes (not in tree): wip/handoff-refresh, wip/ai-handoff-provider, wip/launcher-button
+- Preserved as stashes (not in tree): wip/launcher-button
 
-Generated at: 2026-04-18T01:48:05+05:30
+Generated at: 2026-04-18T03:16:58+05:30

@@ -22,9 +22,7 @@ Read these first:
 - /home/sattv/projects/spidernet-control-deck/.setu_scan/git-summary.txt
 
 Preserved lanes (git stashes — do NOT mix; resume one at a time only after scope approval):
-- stash wip/ai-handoff-provider (Bridge track; blocked on missing ai-providers.ts + SDK dep approval)
 - stash wip/launcher-button   (Ubuntu Terminal Launcher track, NOT Bridge)
-- stash wip/handoff-refresh   (superseded by current rewrite; discardable)
 
 Rules:
 - Do not restart discovery

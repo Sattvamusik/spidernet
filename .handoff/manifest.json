@@ -3,13 +3,13 @@
   "code_repo": "/home/sattv/projects/spidernet-control-deck",
   "context_workspace": "/home/sattv/SpiderNet_Control/08_HIVE/DRISHTI",
   "branch": "fix/setu-storage-data-contract-001",
-  "latest_commit": "62fc21e",
+  "latest_commit": "aa65587",
   "verified": {
     "lint": true,
     "tsc_no_emit": true,
     "build": true,
-    "verified_at_commit": "62fc21e",
-    "verified_at": "2026-04-18T01:48:05+05:30"
+    "verified_at_commit": "aa65587",
+    "verified_at": "2026-04-18T03:16:58+05:30"
   },
   "scope_lock": {
     "brain_v1_mode": "read_only",
@@ -24,9 +24,7 @@
     "exclude_setu_launcher_node": true
   },
   "preserved_lanes": {
-    "wip/ai-handoff-provider": "stash — Bridge track; blocked on missing ai-providers.ts and dep approval",
-    "wip/launcher-button": "stash — Launcher track (NOT Bridge)",
-    "wip/handoff-refresh": "stash — superseded by this rewrite; discardable"
+    "wip/launcher-button": "stash — Ubuntu Terminal Launcher track (NOT Bridge)"
   },
-  "next_step": "await scope approval per preserved lane; no new code packet until then"
+  "next_step": "SETU Bridge thread complete at aa65587; only remaining preserved lane is wip/launcher-button under the Ubuntu Terminal Launcher track"
 }

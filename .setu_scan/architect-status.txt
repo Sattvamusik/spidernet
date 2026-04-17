@@ -1,12 +1,21 @@
-# Architect status — snapshot at HEAD 62fc21e — 2026-04-18T01:48:05+05:30
+# Architect status — snapshot at HEAD aa65587 — 2026-04-18T03:16:58+05:30
 
 PROJECT: spidernet-control-deck (SETU Bridge dashboard)
 BRANCH:  fix/setu-storage-data-contract-001
-HEAD:    62fc21e cleanup(spidernet): remove brain status compatibility bridge
+HEAD:    aa65587 AI Handoff Provider B: add fetch-based Anthropic provider with failure taxonomy
 
 BRIDGE PIPELINE — committed at HEAD:
   Ingest v1 → Filtration Routing v1 → Memory Feed v1
-  → FTD Workflow v1 → FTD Dispatch v1 → AI Handoff v1 (stub)
+  → FTD Workflow v1 → FTD Dispatch v1
+  → AI Handoff Provider A+B (real Anthropic via fetch; stub fallback)
+
+AI HANDOFF PROVIDER:
+  payload: canonical AIHandoffPayloadV1 (defined in src/lib/spidernet/ai-handoff.ts)
+  layer:   src/lib/spidernet/ai-providers.ts (fetch-based; no SDK dep)
+  targets: stub (default), anthropic
+  env:     AI_HANDOFF_PROVIDER, ANTHROPIC_API_KEY, ANTHROPIC_MODEL (default claude-sonnet-4-6), AI_HANDOFF_MAX_TOKENS (default 1024)
+  failure: config | auth | network | response_schema | rate_limit | permanent
+  retry:   no in-call retries; sent.json written only on success, so next dispatch retries naturally
 
 BRIDGE BOARD:
   slug: setu-bridge (dash-004-setu-bridge)
@@ -14,23 +23,20 @@ BRIDGE BOARD:
   policy routing: src/lib/spidernet/policy.ts:144 (build-class → dash-004-setu-bridge)
   ftd stage map:  src/lib/spidernet/ftd.ts:50  (dash-004-setu-bridge → execution)
 
-OWNERSHIP SPLIT (docs/architecture/setu-mine-vs-bridge.md, untracked):
+OWNERSHIP SPLIT (docs/architecture/setu-mine-vs-bridge.md, committed in 67b4138):
   Ubuntu Terminal Launcher = access (open/start system)
   SETU Bridge              = logic  (process/workflow system)
 
-VERIFIED CHECKS AT HEAD 62fc21e:
+VERIFIED CHECKS AT HEAD aa65587:
   npm run lint     PASS
   npx tsc --noEmit PASS
   npm run build    PASS
 
 PRESERVED LANES (git stashes; not committed; do NOT mix):
-  wip/ai-handoff-provider  Bridge track  blocked (missing ai-providers.ts + SDK dep)
   wip/launcher-button      Launcher      NOT Bridge
-  wip/handoff-refresh      Paperwork     superseded by current rewrite
 
 WORKING TREE RESIDUAL:
-  M tsconfig.tsbuildinfo                    (artifact, regenerates)
-  ?? docs/architecture/setu-mine-vs-bridge.md (untracked ownership charter)
+  M tsconfig.tsbuildinfo (artifact, regenerates)
 
 SCOPE LOCKS:
   Brain v1 read-only

@@ -1,6 +1,6 @@
 # FTD.list — future-to-do list, one item per line
 # Sources: plans/ftd.md (deck), DRISHTI/FTD.md (spec)
-# Generated at: 2026-04-18T01:48:05+05:30 from HEAD 62fc21e
+# Generated at: 2026-04-18T03:16:58+05:30 from HEAD aa65587
 
 [HIGH] add live packet mutation flows if Dash 001..005 need in-app editing rather than read-only runtime display
 [HIGH] add a dedicated smoke or test script to package.json
@@ -35,6 +35,4 @@
 [DRISHTI] Add route-specific storage backends for DNA, RUL, LIB, BLP, FTD, and templates
 [DRISHTI] Add real screenshot/upload permission handling instead of architectural placeholders only
 
-[LANE] wip/ai-handoff-provider — Bridge: real AI provider call; blocked on missing src/lib/spidernet/ai-providers.ts and on @anthropic-ai/sdk dep approval
 [LANE] wip/launcher-button — Launcher (NOT Bridge): fixed floating SETU button in src/app/layout.tsx
-[LANE] wip/handoff-refresh — superseded; discardable after acceptance
