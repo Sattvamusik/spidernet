@@ -9,6 +9,7 @@ import {
   type CompactIngestPacket,
 } from "@/lib/spidernet/ingest";
 import { appendPacket } from "@/lib/spidernet/storage";
+import { attemptHandoff } from "@/lib/spidernet/ai-handoff";
 import type { BoardId } from "@/lib/spidernet/types";
 import type { RouteDecisionRecord } from "@/lib/spidernet/filtration";
 
@@ -203,5 +204,19 @@ export function dispatchSeed(seed: WorkflowSeed): DispatchResult {
     packetKind,
     packetId,
   });
+
+  attemptHandoff(
+    {
+      packetId,
+      kind: packetKind,
+      boardId: seed.boardId,
+      lane: seed.lane,
+      classifications: seed.classifications,
+      routeFamilies: seed.routeFamilies,
+      vaultTargets: seed.vaultTargets,
+    },
+    seed.sourceHash,
+  );
+
   return { duplicate: false, skipped: false, entry };
 }
