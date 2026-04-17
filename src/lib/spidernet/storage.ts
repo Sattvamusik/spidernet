@@ -236,19 +236,31 @@ export function appendLedgerEvent(event: LedgerEventRecord | Record<string, unkn
   return appendJsonArrayItem<Record<string, unknown>>(RUNTIME_PATHS.ledgerEvents, event);
 }
 
-export function createDash001IntakePacket(): {
+export function createDash001IntakePacket(input?: {
+  objective?: string;
+  body?: string;
+}): {
   packet: IntakePacketRecord;
   ledgerEvent: LedgerEventRecord;
 } {
   const createdAt = nowIso();
+  const trimmedObjective = input?.objective?.trim() ?? "";
+  const trimmedBody = input?.body?.trim() ?? "";
+  const attachments: string[] = [];
+  if (trimmedBody.length > 0) {
+    attachments.push(trimmedBody);
+  }
   const packet: IntakePacketRecord = {
     packetId: `intake-${createdAt.replace(/[:.]/g, "-")}-${randomUUID().slice(0, 8)}`,
-    objective: "Dash 001 intake packet created from the white SETU UI.",
+    objective:
+      trimmedObjective.length > 0
+        ? trimmedObjective
+        : "Dash 001 intake packet created from the white SETU UI.",
     classifications: ["dash-001", "manual-trigger", "safe-default"],
     routes: ["/boards/input-data"],
     vaultTargets: ["/boards/memory-ledger"],
     intakeModes: ["ui-trigger"],
-    attachments: [],
+    attachments,
     status: "captured",
     createdAt,
     source: "white-web-setu",

@@ -1,9 +1,34 @@
 import { NextResponse } from "next/server";
 import { randomUUID } from "crypto";
 import { runCodingFlow } from "@/lib/spidernet/coding-flow";
+import { ingest } from "@/lib/spidernet/ingest";
 import { appendLedgerEvent, createDash001IntakePacket, type LedgerEventRecord } from "@/lib/spidernet/storage";
 
 export async function POST(request: Request) {
+  const formData = await request.formData().catch(() => null);
+  const objectiveField = formData?.get("objective");
+  const bodyField = formData?.get("body");
+  const objective = typeof objectiveField === "string" ? objectiveField : undefined;
+  const body = typeof bodyField === "string" ? bodyField : undefined;
+
+  const ingestResult = ingest({
+    objective,
+    body,
+    source: "api/spidernet/intake",
+  });
+
+  if (ingestResult.duplicate) {
+    const dupEvent: LedgerEventRecord = {
+      eventId: `evt-${randomUUID().slice(0, 12)}`,
+      type: "intake_duplicate_cache_hit",
+      packetId: ingestResult.packet.hash,
+      detail: `Dash 001 intake duplicate cache hit (hitCount=${ingestResult.hitCount}). No new intake packet was created.`,
+      createdAt: new Date().toISOString(),
+    };
+    appendLedgerEvent(dupEvent);
+    return NextResponse.redirect(new URL("/boards/input-data", request.url), 303);
+  }
+
   const codingFlow = runCodingFlow({
     actor: "white-web-setu",
     stage: "dash-001-intake",
@@ -23,7 +48,7 @@ export async function POST(request: Request) {
     console.warn("[spidernet]intake coding flow hold:", codingFlow.holdReason);
   }
 
-  const intakeRecord = createDash001IntakePacket();
+  const intakeRecord = createDash001IntakePacket({ objective, body });
   const codingFlowLedgerEvent: LedgerEventRecord = {
     eventId: `evt-${randomUUID().slice(0, 12)}`,
     type: "coding_flow_preflight",

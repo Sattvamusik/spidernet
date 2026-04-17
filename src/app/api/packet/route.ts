@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { ingest } from "@/lib/spidernet/ingest";
 import { appendLedgerEvent, appendPacket } from "@/lib/spidernet/storage";
 
 function detectType(input: string): string {
@@ -25,13 +26,27 @@ export async function POST(req: Request) {
       );
     }
 
+    const ingestResult = ingest({ body: input, source: "api/packet" });
+
+    if (ingestResult.duplicate) {
+      return NextResponse.json({
+        success: true,
+        duplicate: true,
+        hitCount: ingestResult.hitCount,
+        ingest: ingestResult.packet,
+      });
+    }
+
     const packet = {
-      id: `pkt_${Date.now()}`,
+      id: `pkt_${ingestResult.packet.hash.slice(0, 12)}`,
       type: "intake",
       classification: detectType(input),
-      input,
+      ingestHash: ingestResult.packet.hash,
+      rawRef: ingestResult.rawRef,
+      byteCount: ingestResult.packet.byteCount,
+      tokenEstimate: ingestResult.packet.tokenEstimate,
       status: "created",
-      created_at: new Date().toISOString(),
+      created_at: ingestResult.packet.createdAt,
     };
 
     appendPacket("intake", packet);
@@ -43,7 +58,7 @@ export async function POST(req: Request) {
       created_at: packet.created_at,
     });
 
-    return NextResponse.json({ success: true, packet });
+    return NextResponse.json({ success: true, duplicate: false, packet });
   } catch (error) {
     return NextResponse.json(
       {

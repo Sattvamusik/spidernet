@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 
-import type { BrainStatus, ContinuityStatus, DashboardSnapshot } from "./types";
+import type { BrainStatus, ContinuityStatus, DashboardSnapshot, ManagerSynthesis } from "./types";
 import { loadRuntimeStorage } from "./storage";
 import { loadPosture } from "./brain/posture";
 
@@ -192,6 +192,34 @@ function buildPolicyDecision(packet: ReturnType<typeof safePacket>) {
             : "No vault target is assigned.",
       },
     ],
+  };
+}
+
+function buildManagerSynthesis(
+  policyDecisions: ReturnType<typeof buildPolicyDecision>[],
+): ManagerSynthesis {
+  const activeHolds = policyDecisions
+    .map((decision) => decision.holdReason)
+    .filter((reason): reason is string => typeof reason === "string" && reason.length > 0);
+  const placeholder = "Manager synthesis is not yet computed in this milestone.";
+  console.info(
+    "[spidernet]data manager synthesis built:",
+    `decisions=${policyDecisions.length}`,
+    `holds=${activeHolds.length}`,
+  );
+  return {
+    manager: "saarthi",
+    consensus: placeholder,
+    conflict: placeholder,
+    safestPath: placeholder,
+    fastestViablePath: placeholder,
+    lowestCostViablePath: placeholder,
+    bestLongTermPath: placeholder,
+    recommendedBoard: "dash-001-input-data",
+    recommendedLane: "Operator",
+    recommendedExposure: "manual_hold",
+    whyNow: placeholder,
+    activeHolds,
   };
 }
 
@@ -491,7 +519,7 @@ export function getDashboardSnapshot(): DashboardSnapshot {
     registryCatalog,
 
     scoreMemory: scoreRegistry,
-    managerSynthesis: [],
+    managerSynthesis: buildManagerSynthesis(policyDecisions),
     readinessGates: [],
     researchTools: [],
     liveTools: [],
