@@ -1,9 +1,16 @@
 /**
  * smoke:ai-handoff — offline smoke for the SETU Bridge AI handoff path.
  *
- * Exercises attemptHandoff against the stub provider with no network access.
- * Seeds a synthetic compact packet, calls attemptHandoff, asserts payload
- * shape + attempt file + sent.json write, then cleans up its own entries.
+ * Runs two scenarios against attemptHandoff with no network access:
+ *
+ *   1. Stub success — AI_HANDOFF_PROVIDER=stub writes an attempt and sent.json entry.
+ *   2. Failure path — AI_HANDOFF_PROVIDER=anthropic without ANTHROPIC_API_KEY
+ *      triggers a "config" AiProviderError in sendAnthropic (no fetch is issued),
+ *      so the attempt is written with status "error" and sent.json stays clean,
+ *      and a second dispatch produces a fresh attempt rather than a cache hit.
+ *
+ * Each scenario seeds its own synthetic compact packet and cleans up every
+ * artifact it created so the smoke is hermetic.
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -23,13 +30,24 @@ import {
 
 type Check = { ok: boolean; label: string };
 
-async function main(): Promise<void> {
-  const runId = randomUUID().slice(0, 8);
-  const hash = createHash("sha256")
-    .update(`smoke-${runId}-${Date.now()}`, "utf8")
-    .digest("hex");
-  const packetId = `smoke-pkt-${runId}`;
+type Recorder = (ok: boolean, label: string) => void;
 
+type ArtifactTracker = {
+  compactPath: string;
+  attemptPaths: string[];
+  packetIds: string[];
+  handoffsBaseExisted: boolean;
+  attemptsDirExisted: boolean;
+  sentIndexExisted: boolean;
+};
+
+function seedCompactPacket(runId: string): {
+  hash: string;
+  compactPath: string;
+} {
+  const hash = createHash("sha256")
+    .update(`smoke-${runId}-${Date.now()}-${Math.random()}`, "utf8")
+    .digest("hex");
   const compact: CompactIngestPacket = {
     hash,
     createdAt: new Date().toISOString(),
@@ -41,18 +59,25 @@ async function main(): Promise<void> {
     tokenEstimate: 16,
     rawRef: null,
   };
-
   const compactPath = path.join(INGEST_PATHS.packetDir, `${hash}.json`);
-  const attemptPath = path.join(HANDOFF_PATHS.attemptsDir, `${packetId}.json`);
-
-  const handoffsBaseExisted = fs.existsSync(HANDOFF_PATHS.base);
-  const attemptsDirExisted = fs.existsSync(HANDOFF_PATHS.attemptsDir);
-  const sentIndexExisted = fs.existsSync(HANDOFF_PATHS.sentIndex);
-
   fs.mkdirSync(path.dirname(compactPath), { recursive: true });
   fs.writeFileSync(compactPath, `${JSON.stringify(compact, null, 2)}\n`, "utf8");
+  return { hash, compactPath };
+}
 
-  const dispatched: HandoffDispatchedPacket = {
+function snapshotHandoffDirs(): Pick<
+  ArtifactTracker,
+  "handoffsBaseExisted" | "attemptsDirExisted" | "sentIndexExisted"
+> {
+  return {
+    handoffsBaseExisted: fs.existsSync(HANDOFF_PATHS.base),
+    attemptsDirExisted: fs.existsSync(HANDOFF_PATHS.attemptsDir),
+    sentIndexExisted: fs.existsSync(HANDOFF_PATHS.sentIndex),
+  };
+}
+
+function makeDispatched(packetId: string): HandoffDispatchedPacket {
+  return {
     packetId,
     kind: "execution",
     boardId: "dash-004-setu-bridge",
@@ -61,100 +86,221 @@ async function main(): Promise<void> {
     routeFamilies: ["bridge"],
     vaultTargets: ["artifacts/smoke"],
   };
+}
 
-  const checks: Check[] = [];
-  const record = (ok: boolean, label: string) => checks.push({ ok, label });
+function cleanup(tracker: ArtifactTracker): void {
+  try {
+    fs.rmSync(tracker.compactPath, { force: true });
+  } catch {}
+  for (const p of tracker.attemptPaths) {
+    try {
+      fs.rmSync(p, { force: true });
+    } catch {}
+  }
+
+  if (fs.existsSync(HANDOFF_PATHS.sentIndex)) {
+    try {
+      const sent = JSON.parse(
+        fs.readFileSync(HANDOFF_PATHS.sentIndex, "utf8"),
+      ) as Record<string, unknown>;
+      for (const id of tracker.packetIds) {
+        if (id in sent) delete sent[id];
+      }
+      const remaining = Object.keys(sent).length;
+      if (remaining === 0 && !tracker.sentIndexExisted) {
+        fs.rmSync(HANDOFF_PATHS.sentIndex, { force: true });
+      } else {
+        fs.writeFileSync(
+          HANDOFF_PATHS.sentIndex,
+          `${JSON.stringify(sent, null, 2)}\n`,
+          "utf8",
+        );
+      }
+    } catch {}
+  }
+
+  if (!tracker.attemptsDirExisted) {
+    try {
+      fs.rmdirSync(HANDOFF_PATHS.attemptsDir);
+    } catch {}
+  }
+  if (!tracker.handoffsBaseExisted) {
+    try {
+      fs.rmdirSync(HANDOFF_PATHS.base);
+    } catch {}
+  }
+}
+
+async function runStubSuccessScenario(record: Recorder): Promise<void> {
+  const prevProvider = process.env.AI_HANDOFF_PROVIDER;
+  process.env.AI_HANDOFF_PROVIDER = "stub";
+
+  const runId = randomUUID().slice(0, 8);
+  const packetId = `smoke-pkt-${runId}`;
+  const { hash, compactPath } = seedCompactPacket(runId);
+  const attemptPath = path.join(HANDOFF_PATHS.attemptsDir, `${packetId}.json`);
+
+  const tracker: ArtifactTracker = {
+    compactPath,
+    attemptPaths: [attemptPath],
+    packetIds: [packetId],
+    ...snapshotHandoffDirs(),
+  };
+
+  const dispatched = makeDispatched(packetId);
 
   try {
     const result = await attemptHandoff(dispatched, hash);
 
-    record(result.duplicate === false, "first attempt is not a duplicate");
+    record(result.duplicate === false, "stub: first attempt is not a duplicate");
     if (!result.duplicate) {
       const a = result.attempt;
-      record(a.target === "stub", "attempt target is stub");
-      record(a.status === "stub_sent", "attempt status is stub_sent");
-      record(a.packetId === packetId, "attempt packetId matches input");
-      record(a.sourceHash === hash, "attempt sourceHash matches input");
-      record(a.kind === "execution", "attempt kind preserved");
-      record(a.error === undefined, "no error recorded on stub path");
-      record(a.response?.text === null, "stub response text is null");
-      record(a.context.packetId === packetId, "payload packetId matches");
+      record(a.target === "stub", "stub: attempt target is stub");
+      record(a.status === "stub_sent", "stub: attempt status is stub_sent");
+      record(a.packetId === packetId, "stub: attempt packetId matches input");
+      record(a.sourceHash === hash, "stub: attempt sourceHash matches input");
+      record(a.kind === "execution", "stub: attempt kind preserved");
+      record(a.error === undefined, "stub: no error recorded");
+      record(a.response?.text === null, "stub: response text is null");
+      record(a.context.packetId === packetId, "stub: payload packetId matches");
       record(
         a.context.boardId === "dash-004-setu-bridge",
-        "payload boardId matches",
+        "stub: payload boardId matches",
       );
-      record(a.context.lane === "bridge.smoke", "payload lane matches");
+      record(a.context.lane === "bridge.smoke", "stub: payload lane matches");
       record(
         a.context.objectivePreview === "smoke handoff objective",
-        "payload objectivePreview hydrated from compact packet",
+        "stub: payload objectivePreview hydrated from compact packet",
       );
       record(
         a.context.tokenEstimate === 16,
-        "payload tokenEstimate hydrated from compact packet",
+        "stub: payload tokenEstimate hydrated from compact packet",
       );
       record(
         a.context.classifications.length === 1 &&
           a.context.classifications[0] === "smoke",
-        "payload classifications preserved",
+        "stub: payload classifications preserved",
       );
     }
 
-    record(fs.existsSync(attemptPath), "attempt file written on disk");
-    record(fs.existsSync(HANDOFF_PATHS.sentIndex), "sent.json exists");
+    record(fs.existsSync(attemptPath), "stub: attempt file written on disk");
+    record(fs.existsSync(HANDOFF_PATHS.sentIndex), "stub: sent.json exists");
 
     if (fs.existsSync(HANDOFF_PATHS.sentIndex)) {
       const sent = JSON.parse(
         fs.readFileSync(HANDOFF_PATHS.sentIndex, "utf8"),
       ) as Record<string, { handoffId: string; sentAt: string }>;
       const entry = sent[packetId];
-      record(entry !== undefined, "sent.json records smoke packetId");
+      record(entry !== undefined, "stub: sent.json records smoke packetId");
       record(
-        typeof entry?.handoffId === "string" && entry.handoffId.startsWith("ho-"),
-        "sent.json entry has ho- handoffId",
+        typeof entry?.handoffId === "string" &&
+          entry.handoffId.startsWith("ho-"),
+        "stub: sent.json entry has ho- handoffId",
       );
       record(
         typeof entry?.sentAt === "string" && entry.sentAt.length > 0,
-        "sent.json entry has sentAt timestamp",
+        "stub: sent.json entry has sentAt timestamp",
       );
     }
   } finally {
-    try {
-      fs.rmSync(compactPath, { force: true });
-    } catch {}
-    try {
-      fs.rmSync(attemptPath, { force: true });
-    } catch {}
-
-    if (fs.existsSync(HANDOFF_PATHS.sentIndex)) {
-      try {
-        const sent = JSON.parse(
-          fs.readFileSync(HANDOFF_PATHS.sentIndex, "utf8"),
-        ) as Record<string, unknown>;
-        if (packetId in sent) delete sent[packetId];
-        const remaining = Object.keys(sent).length;
-        if (remaining === 0 && !sentIndexExisted) {
-          fs.rmSync(HANDOFF_PATHS.sentIndex, { force: true });
-        } else {
-          fs.writeFileSync(
-            HANDOFF_PATHS.sentIndex,
-            `${JSON.stringify(sent, null, 2)}\n`,
-            "utf8",
-          );
-        }
-      } catch {}
-    }
-
-    if (!attemptsDirExisted) {
-      try {
-        fs.rmdirSync(HANDOFF_PATHS.attemptsDir);
-      } catch {}
-    }
-    if (!handoffsBaseExisted) {
-      try {
-        fs.rmdirSync(HANDOFF_PATHS.base);
-      } catch {}
-    }
+    cleanup(tracker);
+    if (prevProvider === undefined) delete process.env.AI_HANDOFF_PROVIDER;
+    else process.env.AI_HANDOFF_PROVIDER = prevProvider;
   }
+}
+
+async function runFailurePathScenario(record: Recorder): Promise<void> {
+  const prevProvider = process.env.AI_HANDOFF_PROVIDER;
+  const prevKey = process.env.ANTHROPIC_API_KEY;
+  process.env.AI_HANDOFF_PROVIDER = "anthropic";
+  delete process.env.ANTHROPIC_API_KEY;
+
+  const runId = randomUUID().slice(0, 8);
+  const packetId = `smoke-fail-${runId}`;
+  const { hash, compactPath } = seedCompactPacket(runId);
+  const attemptPath = path.join(HANDOFF_PATHS.attemptsDir, `${packetId}.json`);
+
+  const tracker: ArtifactTracker = {
+    compactPath,
+    attemptPaths: [attemptPath],
+    packetIds: [packetId],
+    ...snapshotHandoffDirs(),
+  };
+
+  const dispatched = makeDispatched(packetId);
+
+  try {
+    const first = await attemptHandoff(dispatched, hash);
+
+    record(first.duplicate === false, "fail: first attempt is not a duplicate");
+    let firstHandoffId: string | null = null;
+    if (!first.duplicate) {
+      const a = first.attempt;
+      firstHandoffId = a.handoffId;
+      record(a.status === "error", "fail: attempt status is error");
+      record(a.target === "anthropic", "fail: attempt target is anthropic");
+      record(a.response === null, "fail: attempt response is null");
+      record(a.error?.kind === "config", "fail: error kind is config");
+      record(
+        typeof a.error?.message === "string" && a.error.message.length > 0,
+        "fail: error message is populated",
+      );
+    }
+
+    record(
+      fs.existsSync(attemptPath),
+      "fail: attempt file written on disk despite failure",
+    );
+
+    const sentAfterFailure = fs.existsSync(HANDOFF_PATHS.sentIndex)
+      ? (JSON.parse(
+          fs.readFileSync(HANDOFF_PATHS.sentIndex, "utf8"),
+        ) as Record<string, unknown>)
+      : {};
+    record(
+      !(packetId in sentAfterFailure),
+      "fail: sent.json does not record failed packetId",
+    );
+
+    const second = await attemptHandoff(dispatched, hash);
+
+    record(
+      second.duplicate === false,
+      "fail: rerun is not a cache hit (retry-on-next-dispatch holds)",
+    );
+    if (!second.duplicate && firstHandoffId !== null) {
+      const a = second.attempt;
+      record(
+        a.handoffId !== firstHandoffId,
+        "fail: rerun produces a fresh handoffId",
+      );
+      record(a.status === "error", "fail: rerun attempt status is error");
+    }
+
+    const sentAfterRerun = fs.existsSync(HANDOFF_PATHS.sentIndex)
+      ? (JSON.parse(
+          fs.readFileSync(HANDOFF_PATHS.sentIndex, "utf8"),
+        ) as Record<string, unknown>)
+      : {};
+    record(
+      !(packetId in sentAfterRerun),
+      "fail: sent.json still clean after rerun",
+    );
+  } finally {
+    cleanup(tracker);
+    if (prevProvider === undefined) delete process.env.AI_HANDOFF_PROVIDER;
+    else process.env.AI_HANDOFF_PROVIDER = prevProvider;
+    if (prevKey === undefined) delete process.env.ANTHROPIC_API_KEY;
+    else process.env.ANTHROPIC_API_KEY = prevKey;
+  }
+}
+
+async function main(): Promise<void> {
+  const checks: Check[] = [];
+  const record: Recorder = (ok, label) => checks.push({ ok, label });
+
+  await runStubSuccessScenario(record);
+  await runFailurePathScenario(record);
 
   const failed = checks.filter((c) => !c.ok);
   for (const c of checks) {
