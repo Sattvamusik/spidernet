@@ -20,6 +20,7 @@ These exist in the working tree but were not created by any committed packet in 
     2. **Remove** if confirmed accidental.
     3. **Continue to defer** — leave untracked; re-evaluate in the next Bridge thread.
   - Policy until decided: do not touch; do not bundle with other packets; keep flagged in every handoff refresh.
+  - **Decision (2026-04-18):** src/app/api/health/route.ts deferred to next Bridge thread for decision (commit/remove). Reason: endpoint origin and intent are unclear, no caller exists in the current tree, and it is not part of the SETU Bridge core milestone; avoid committing or deleting without full context.
 
 ## Resolved
 - Compatibility cleanup vs future write-path/ledger design — both complete. Write path + admin route landed (Phases 2a..2d-2); compatibility bridge retired via 62fc21e.
