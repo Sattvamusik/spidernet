@@ -1,13 +1,19 @@
 /**
  * smoke:ai-handoff — offline smoke for the SETU Bridge AI handoff path.
  *
- * Runs two scenarios against attemptHandoff with no network access:
+ * Runs three scenarios against attemptHandoff with no network access, covering
+ * the full sent.json state machine:
  *
- *   1. Stub success — AI_HANDOFF_PROVIDER=stub writes an attempt and sent.json entry.
- *   2. Failure path — AI_HANDOFF_PROVIDER=anthropic without ANTHROPIC_API_KEY
- *      triggers a "config" AiProviderError in sendAnthropic (no fetch is issued),
- *      so the attempt is written with status "error" and sent.json stays clean,
- *      and a second dispatch produces a fresh attempt rather than a cache hit.
+ *   1. Stub success   — AI_HANDOFF_PROVIDER=stub writes an attempt and a
+ *                       sent.json entry.
+ *   2. Failure path   — AI_HANDOFF_PROVIDER=anthropic without ANTHROPIC_API_KEY
+ *                       triggers a "config" AiProviderError in sendAnthropic
+ *                       (no fetch is issued), so the attempt is written with
+ *                       status "error" and sent.json stays clean; a rerun
+ *                       produces a fresh attempt rather than a cache hit.
+ *   3. Cache hit      — A second dispatch after a stub success returns
+ *                       { duplicate: true } referencing the original handoffId,
+ *                       without rewriting the attempt file.
  *
  * Each scenario seeds its own synthetic compact packet and cleans up every
  * artifact it created so the smoke is hermetic.
@@ -295,12 +301,86 @@ async function runFailurePathScenario(record: Recorder): Promise<void> {
   }
 }
 
+async function runCacheHitScenario(record: Recorder): Promise<void> {
+  const prevProvider = process.env.AI_HANDOFF_PROVIDER;
+  process.env.AI_HANDOFF_PROVIDER = "stub";
+
+  const runId = randomUUID().slice(0, 8);
+  const packetId = `smoke-cache-${runId}`;
+  const { hash, compactPath } = seedCompactPacket(runId);
+  const attemptPath = path.join(HANDOFF_PATHS.attemptsDir, `${packetId}.json`);
+
+  const tracker: ArtifactTracker = {
+    compactPath,
+    attemptPaths: [attemptPath],
+    packetIds: [packetId],
+    ...snapshotHandoffDirs(),
+  };
+
+  const dispatched = makeDispatched(packetId);
+
+  try {
+    const first = await attemptHandoff(dispatched, hash);
+
+    record(first.duplicate === false, "cache: first dispatch is not a duplicate");
+    if (first.duplicate) return;
+
+    const originalHandoffId = first.attempt.handoffId;
+    const originalSentAt = first.attempt.sentAt;
+    const firstAttemptStat = fs.statSync(attemptPath);
+
+    // Small delay so mtime would differ if the file were rewritten.
+    await new Promise((resolve) => setTimeout(resolve, 10));
+
+    const second = await attemptHandoff(dispatched, hash);
+
+    record(second.duplicate === true, "cache: rerun returns duplicate=true");
+    if (second.duplicate) {
+      record(
+        second.entry.handoffId === originalHandoffId,
+        "cache: duplicate entry handoffId matches original",
+      );
+      record(
+        second.entry.sentAt === originalSentAt,
+        "cache: duplicate entry sentAt matches original",
+      );
+    }
+
+    const secondAttemptStat = fs.statSync(attemptPath);
+    record(
+      secondAttemptStat.mtimeMs === firstAttemptStat.mtimeMs &&
+        secondAttemptStat.size === firstAttemptStat.size,
+      "cache: attempt file was not rewritten on cache hit",
+    );
+
+    if (fs.existsSync(HANDOFF_PATHS.sentIndex)) {
+      const sent = JSON.parse(
+        fs.readFileSync(HANDOFF_PATHS.sentIndex, "utf8"),
+      ) as Record<string, { handoffId: string; sentAt: string }>;
+      const entry = sent[packetId];
+      record(
+        entry?.handoffId === originalHandoffId,
+        "cache: sent.json entry handoffId unchanged after rerun",
+      );
+      record(
+        entry?.sentAt === originalSentAt,
+        "cache: sent.json entry sentAt unchanged after rerun",
+      );
+    }
+  } finally {
+    cleanup(tracker);
+    if (prevProvider === undefined) delete process.env.AI_HANDOFF_PROVIDER;
+    else process.env.AI_HANDOFF_PROVIDER = prevProvider;
+  }
+}
+
 async function main(): Promise<void> {
   const checks: Check[] = [];
   const record: Recorder = (ok, label) => checks.push({ ok, label });
 
   await runStubSuccessScenario(record);
   await runFailurePathScenario(record);
+  await runCacheHitScenario(record);
 
   const failed = checks.filter((c) => !c.ok);
   for (const c of checks) {
