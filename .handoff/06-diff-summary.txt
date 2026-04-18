@@ -5,13 +5,13 @@
 stash@{0}: On fix/setu-storage-data-contract-001: wip/launcher-button
 
 === latest commits ===
+2995a58 Bridge: add cache-hit case to smoke-ai-handoff
+110e3a3 Bridge: add failure-path case to smoke-ai-handoff
+54b0e53 Bridge: add smoke-ai-handoff script
+086c454 Handoff: refresh metadata-only packet after Provider B
 aa65587 AI Handoff Provider B: add fetch-based Anthropic provider with failure taxonomy
 21ee7be AI Handoff Provider A: async refactor and rename payload to AIHandoffPayloadV1
 67b4138 Handoff: refresh resume state and record preserved lanes at 62fc21e
 62fc21e cleanup(spidernet): remove brain status compatibility bridge
-6bb7fcd AI Handoff v1: add controlled cached handoff from downstream packets
-e2060e4 FTD Dispatch v1: consume workflow seeds and append downstream packet records
-66a6676 FTD Workflow v1: seed workflows from accepted routed packets
-4549f5b Memory Feed v1: persist accepted routed packet summaries
 
-Generated at: 2026-04-18T03:16:58+05:30
+Generated at: 2026-04-18T13:00:54+05:30

@@ -4,20 +4,23 @@
 - Code repo: /home/sattv/projects/spidernet-control-deck
 - Context workspace: /home/sattv/SpiderNet_Control/08_HIVE/DRISHTI
 - Branch: fix/setu-storage-data-contract-001
-- HEAD: aa65587
+- HEAD: 2995a58
 
 ## Latest commits (at HEAD)
+- 2995a58 — Bridge: add cache-hit case to smoke-ai-handoff
+- 110e3a3 — Bridge: add failure-path case to smoke-ai-handoff
+- 54b0e53 — Bridge: add smoke-ai-handoff script
+- 086c454 — Handoff: refresh metadata-only packet after Provider B
 - aa65587 — AI Handoff Provider B: add fetch-based Anthropic provider with failure taxonomy
 - 21ee7be — AI Handoff Provider A: async refactor and rename payload to AIHandoffPayloadV1
 - 67b4138 — Handoff: refresh resume state and record preserved lanes at 62fc21e
 - 62fc21e — cleanup(spidernet): remove brain status compatibility bridge
-- 6bb7fcd — AI Handoff v1: add controlled cached handoff from downstream packets
-- e2060e4 — FTD Dispatch v1: consume workflow seeds and append downstream packet records
 
-## Verified checks at HEAD aa65587 (2026-04-18T03:16:58+05:30)
+## Verified checks at HEAD 2995a58 (2026-04-18T13:00:54+05:30)
 - npm run lint ✅
 - npx tsc --noEmit ✅
 - npm run build ✅
+- npm run smoke:ai-handoff ✅ (38/38 cases: stub-success + failure-path + cache-hit)
 
 ## Locked rules
 - Brain v1 is read-only
@@ -41,6 +44,7 @@
 - Bridge board: `src/app/boards/[slug]/page.tsx` slug `setu-bridge` → `SpecialistTaskBoard`
 - Policy routing: `src/lib/spidernet/policy.ts:144` — build-class packets → `dash-004-setu-bridge`
 - Ownership split: `docs/architecture/setu-mine-vs-bridge.md` (committed in 67b4138) — Launcher = access; Bridge = logic
+- Bridge smoke suite: `scripts/smoke-ai-handoff.ts` (tsx dev-dep); `npm run smoke:ai-handoff` runs 38 offline assertions over the full `sent.json` state machine — stub-success writes cache, failure-path leaves cache clean and retries on next dispatch, cache-hit returns `duplicate:true` without rewriting the attempt file
 
 ## Preserved lanes (git stashes, not committed — do NOT mix)
 - `stash wip/launcher-button` — Ubuntu Terminal Launcher track (NOT Bridge); floating SETU button in `layout.tsx`. Resume under Launcher thread.

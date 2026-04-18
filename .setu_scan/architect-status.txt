@@ -1,8 +1,8 @@
-# Architect status — snapshot at HEAD aa65587 — 2026-04-18T03:16:58+05:30
+# Architect status — snapshot at HEAD 2995a58 — 2026-04-18T13:00:54+05:30
 
 PROJECT: spidernet-control-deck (SETU Bridge dashboard)
 BRANCH:  fix/setu-storage-data-contract-001
-HEAD:    aa65587 AI Handoff Provider B: add fetch-based Anthropic provider with failure taxonomy
+HEAD:    2995a58 Bridge: add cache-hit case to smoke-ai-handoff
 
 BRIDGE PIPELINE — committed at HEAD:
   Ingest v1 → Filtration Routing v1 → Memory Feed v1
@@ -17,6 +17,15 @@ AI HANDOFF PROVIDER:
   failure: config | auth | network | response_schema | rate_limit | permanent
   retry:   no in-call retries; sent.json written only on success, so next dispatch retries naturally
 
+BRIDGE SMOKE (offline, committed):
+  script:  scripts/smoke-ai-handoff.ts
+  command: npm run smoke:ai-handoff
+  cases:   38/38 covering the full sent.json state machine
+           - stub-success: writes attempt + sent.json entry
+           - failure-path (AI_HANDOFF_PROVIDER=anthropic, no API key → "config" AiProviderError, no fetch issued): writes error attempt, leaves sent.json clean, rerun produces fresh attempt
+           - cache-hit: rerun after success returns duplicate:true without rewriting the attempt file
+  runner:  tsx (devDependency added in 54b0e53)
+
 BRIDGE BOARD:
   slug: setu-bridge (dash-004-setu-bridge)
   renderer: src/components/spidernet/specialist-task-board.tsx
@@ -27,10 +36,11 @@ OWNERSHIP SPLIT (docs/architecture/setu-mine-vs-bridge.md, committed in 67b4138)
   Ubuntu Terminal Launcher = access (open/start system)
   SETU Bridge              = logic  (process/workflow system)
 
-VERIFIED CHECKS AT HEAD aa65587:
-  npm run lint     PASS
-  npx tsc --noEmit PASS
-  npm run build    PASS
+VERIFIED CHECKS AT HEAD 2995a58:
+  npm run lint           PASS
+  npx tsc --noEmit       PASS
+  npm run build          PASS
+  npm run smoke:ai-handoff PASS (38/38)
 
 PRESERVED LANES (git stashes; not committed; do NOT mix):
   wip/launcher-button      Launcher      NOT Bridge

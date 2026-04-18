@@ -1,9 +1,8 @@
 # FTD.list — future-to-do list, one item per line
 # Sources: plans/ftd.md (deck), DRISHTI/FTD.md (spec)
-# Generated at: 2026-04-18T03:16:58+05:30 from HEAD aa65587
+# Generated at: 2026-04-18T13:00:54+05:30 from HEAD 2995a58
 
 [HIGH] add live packet mutation flows if Dash 001..005 need in-app editing rather than read-only runtime display
-[HIGH] add a dedicated smoke or test script to package.json
 [HIGH] add authenticated action handling for approvals and decision queue updates
 [HIGH] decide whether browser automation should become a live wrapper path
 [HIGH] decide whether desktop automation should remain manual hold in the web-first product
@@ -22,7 +21,7 @@
 [LATER] Advanced auth layer for admin and mutation routes
 [LATER] Autonomous multi-agent swarms only after harness, ledger, permissions, and rollback are mature
 
-[BLOCKED] no dedicated automated test script is defined yet
+[CLEARED] dedicated automated test script: `npm run smoke:ai-handoff` (scripts/smoke-ai-handoff.ts) added at 54b0e53, extended with failure-path at 110e3a3 and cache-hit at 2995a58 — 38 offline assertions covering the full sent.json state machine
 
 [DRISHTI] Add durable packet persistence and append-only ledger storage instead of architectural-only packet models
 [DRISHTI] Wire the policy engine to real approval checks, dangerous-operation thresholds, and enforced route blocking
