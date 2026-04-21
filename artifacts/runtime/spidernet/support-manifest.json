@@ -1,0 +1,30 @@
+{
+  "generatedAt": "2026-04-21T22:28:30.164Z",
+  "scope": "Lane 3: Extraction Terminal",
+  "counts": {
+    "ingestSeen": 3,
+    "intakePackets": 10,
+    "researchPackets": 0,
+    "executionPackets": 0,
+    "approvalPackets": 0,
+    "validationPackets": 0,
+    "passPackets": 0,
+    "ledgerEvents": 10,
+    "vaultEntries": 0
+  },
+  "artifacts": {
+    "ftd": {
+      "base": false,
+      "seedsDir": false,
+      "dispatchedIndex": false
+    },
+    "handoffs": {
+      "base": false,
+      "attemptsDir": false,
+      "sentIndex": false
+    },
+    "vault": {
+      "index": true
+    }
+  }
+}

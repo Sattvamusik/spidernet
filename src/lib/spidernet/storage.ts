@@ -100,8 +100,27 @@ export type LedgerEventRecord = {
   createdAt: string;
 };
 
+export type RuntimeIntakePacketRecord = IntakePacketRecord & {
+  id: string;
+  classification: string | null;
+  ingestHash: string | null;
+  rawRef: string | null;
+  created_at: string;
+};
+
+export type RuntimeLedgerEventRecord = LedgerEventRecord & {
+  id: string;
+  action: string;
+  actor: string;
+  scope: string;
+  timestamp: string;
+  appendOnly: true;
+  packetType?: string;
+  created_at: string;
+};
+
 export type RuntimeStorage = {
-  intakePackets: IntakePacketRecord[];
+  intakePackets: RuntimeIntakePacketRecord[];
   researchPackets: Record<string, unknown>[];
   executionPackets: Record<string, unknown>[];
   validationPackets: Record<string, unknown>[];
@@ -112,7 +131,7 @@ export type RuntimeStorage = {
   skillRegistry: Record<string, unknown>[];
   scoreRegistry: Record<string, unknown>[];
 
-  ledgerEvents: LedgerEventRecord[];
+  ledgerEvents: RuntimeLedgerEventRecord[];
   vaultEntries: Record<string, unknown>[];
   ollamaConfig: {
     handshakeStatus: string;
@@ -122,6 +141,103 @@ export type RuntimeStorage = {
     note: string;
   };
 };
+
+function asString(value: unknown): string | null {
+  return typeof value === "string" && value.trim().length > 0 ? value : null;
+}
+
+function asStringArray(value: unknown): string[] {
+  return Array.isArray(value)
+    ? value.filter((entry): entry is string => typeof entry === "string" && entry.length > 0)
+    : [];
+}
+
+function normalizeIntakePacketRecord(
+  value: Record<string, unknown>,
+  index: number,
+): RuntimeIntakePacketRecord {
+  const packetId =
+    asString(value.packetId) ??
+    asString(value.id) ??
+    `intake-fallback-${index + 1}`;
+  const classification = asString(value.classification);
+  const classifications = asStringArray(value.classifications);
+  const createdAt =
+    asString(value.createdAt) ??
+    asString(value.created_at) ??
+    new Date(0).toISOString();
+
+  return {
+    packetId,
+    objective:
+      asString(value.objective) ??
+      `Recovered intake packet ${packetId}${classification ? ` (${classification})` : ""}.`,
+    classifications:
+      classifications.length > 0
+        ? classifications
+        : classification
+          ? [classification]
+          : [],
+    routes: asStringArray(value.routes),
+    vaultTargets: asStringArray(value.vaultTargets),
+    intakeModes: asStringArray(value.intakeModes),
+    attachments: asStringArray(value.attachments),
+    status: asString(value.status) ?? "captured",
+    createdAt,
+    source: asString(value.source) ?? "runtime-storage",
+    id: packetId,
+    classification,
+    ingestHash: asString(value.ingestHash),
+    rawRef: asString(value.rawRef),
+    created_at: createdAt,
+  };
+}
+
+function normalizeLedgerEventRecord(
+  value: Record<string, unknown>,
+  index: number,
+): RuntimeLedgerEventRecord {
+  const id =
+    asString(value.id) ??
+    asString(value.eventId) ??
+    `ledger-fallback-${index + 1}`;
+  const action =
+    asString(value.action) ??
+    asString(value.type) ??
+    "runtime.event";
+  const packetId = asString(value.packetId) ?? "unknown-packet";
+  const packetType = asString(value.packetType) ?? undefined;
+  const timestamp =
+    asString(value.timestamp) ??
+    asString(value.createdAt) ??
+    asString(value.created_at) ??
+    new Date(0).toISOString();
+  const detail =
+    asString(value.detail) ??
+    [
+      packetType ? `packetType=${packetType}` : null,
+      packetId ? `packetId=${packetId}` : null,
+    ]
+      .filter((entry): entry is string => Boolean(entry))
+      .join(" ");
+  const scope = asString(value.scope) ?? detail ?? "lane-3-support";
+
+  return {
+    eventId: id,
+    type: action,
+    packetId,
+    detail: detail ?? scope,
+    createdAt: timestamp,
+    id,
+    action,
+    actor: asString(value.actor) ?? "runtime-storage",
+    scope,
+    timestamp,
+    appendOnly: true,
+    packetType,
+    created_at: timestamp,
+  };
+}
 
 function normalizeOllamaConfig(
   config: Record<string, unknown>,
@@ -193,9 +309,15 @@ function loadOllamaConfigRecord() {
 export function loadRuntimeStorage(): RuntimeStorage {
   const vaultIndex = ensureRecord(readJsonFile<Record<string, unknown>>(RUNTIME_PATHS.vaultIndex, {}));
   const ollamaConfig = loadOllamaConfigRecord();
+  const rawIntakePackets = ensureArray<Record<string, unknown>>(
+    readJsonFile<Record<string, unknown>[]>(RUNTIME_PATHS.intakePackets, []),
+  );
+  const rawLedgerEvents = ensureArray<Record<string, unknown>>(
+    readJsonFile<Record<string, unknown>[]>(RUNTIME_PATHS.ledgerEvents, []),
+  );
 
   return {
-    intakePackets: ensureArray<IntakePacketRecord>(readJsonFile<IntakePacketRecord[]>(RUNTIME_PATHS.intakePackets, [])),
+    intakePackets: rawIntakePackets.map(normalizeIntakePacketRecord),
     researchPackets: ensureArray<Record<string, unknown>>(readJsonFile<Record<string, unknown>[]>(RUNTIME_PATHS.researchPackets, [])),
     executionPackets: ensureArray<Record<string, unknown>>(readJsonFile<Record<string, unknown>[]>(RUNTIME_PATHS.executionPackets, [])),
     validationPackets: ensureArray<Record<string, unknown>>(readJsonFile<Record<string, unknown>[]>(RUNTIME_PATHS.validationPackets, [])),
@@ -206,7 +328,7 @@ export function loadRuntimeStorage(): RuntimeStorage {
     skillRegistry: ensureArray<Record<string, unknown>>(readJsonFile<Record<string, unknown>[]>(RUNTIME_PATHS.skillRegistry, [])),
     scoreRegistry: ensureArray<Record<string, unknown>>(readJsonFile<Record<string, unknown>[]>(RUNTIME_PATHS.scoreRegistry, [])),
 
-    ledgerEvents: ensureArray<LedgerEventRecord>(readJsonFile<LedgerEventRecord[]>(RUNTIME_PATHS.ledgerEvents, [])),
+    ledgerEvents: rawLedgerEvents.map(normalizeLedgerEventRecord),
     vaultEntries: Object.values(vaultIndex) as Record<string, unknown>[],
     ollamaConfig,
   };
