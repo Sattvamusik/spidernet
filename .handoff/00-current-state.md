@@ -56,3 +56,10 @@
 - SETU Bridge work for this thread is complete
 - Launcher-button work belongs to a separate Ubuntu Terminal Launcher thread — do not start it in a Bridge thread
 - Any new Bridge-side follow-up should be a fresh small packet with explicit scope
+
+## 2026-04-21 update
+
+- P-LAUNCH-DESKTOP-01 anchored in repo as `scripts/create_desktop_launcher.sh` + `scripts/launch-dashboard.sh`
+- Desktop icons materialized at `~/Desktop/DRISHTI-Dashboard.desktop` and `/mnt/c/Users/sattv/Desktop/DRISHTI Dashboard.cmd`
+- start-app.sh remains at its DRISHTI absolute path (reference-only — not imported)
+- Not yet committed
