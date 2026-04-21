@@ -1,5 +1,14 @@
 # 🕸 SPIDERNET/VATAYAN — CONTRACTS LIBRARY
 
+## LANE SCOPING
+These contracts are consumed per-lane under the parent-spine-with-
+cognitive-core topology. Registries are shared; slices are lane-scoped.
+Each child lane populates its own slice of the registries without
+colliding with sibling lanes. See `docs/architecture/lane-topology.md`
+for the topology and `rul/lane-preservation.md` for the enforceable
+boundary rules. The attachment model for capabilities is in
+`lib/module-attachment.md`.
+
 ## EVENT CONTRACT
 {
   "id": "evt_*",
