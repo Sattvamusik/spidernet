@@ -4,9 +4,13 @@
 - Code repo: /home/sattv/projects/spidernet-control-deck
 - Context workspace: /home/sattv/SpiderNet_Control/08_HIVE/DRISHTI
 - Branch: fix/setu-storage-data-contract-001
-- HEAD: 2995a58
+- HEAD: 0216325 (last verified-green: 2995a58)
 
 ## Latest commits (at HEAD)
+- 0216325 — feat(setu): add recoverable desktop launcher packet
+- 914fc83 — Handoff: defer health endpoint decision to next thread
+- e9d7a57 — Handoff: record pending health endpoint decision
+- 47554c3 — Handoff: refresh snapshot after smoke-ai-handoff suite
 - 2995a58 — Bridge: add cache-hit case to smoke-ai-handoff
 - 110e3a3 — Bridge: add failure-path case to smoke-ai-handoff
 - 54b0e53 — Bridge: add smoke-ai-handoff script
@@ -62,4 +66,4 @@
 - P-LAUNCH-DESKTOP-01 anchored in repo as `scripts/create_desktop_launcher.sh` + `scripts/launch-dashboard.sh`
 - Desktop icons materialized at `~/Desktop/DRISHTI-Dashboard.desktop` and `/mnt/c/Users/sattv/Desktop/DRISHTI Dashboard.cmd`
 - start-app.sh remains at its DRISHTI absolute path (reference-only — not imported)
-- Not yet committed
+- Committed as 0216325 on 2026-04-21 (title: "feat(setu): add recoverable desktop launcher packet")

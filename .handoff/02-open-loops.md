@@ -2,6 +2,43 @@
 
 1. Adopt handoff protocol as mandatory before future thread transfers.
 
+2. HEAD pointer drift — reconciled 2026-04-21 by P-HANDOFF-RECONCILE-01. HEAD advanced from 2995a58 to 0216325 across 4 commits (47554c3, e9d7a57, 914fc83, 0216325). Manifest and 00-current-state updated. Last verified-green anchor unchanged at 2995a58; any green-verification claim for commits after 2995a58 requires a fresh lint/tsc/build/smoke run.
+
+3. Working-tree edits deferred to another active lane/owner terminal (not Mother Bridge scope). The following paths have uncommitted modifications that Mother Bridge does not own and will not touch:
+   - src/lib/spidernet/ai-handoff.ts
+   - src/lib/spidernet/filtration.ts
+   - src/lib/spidernet/ftd.ts
+   - src/lib/spidernet/ingest.ts
+   - package.json
+   - package-lock.json
+   - artifacts/runtime/spidernet/ledger/events.json
+   - artifacts/runtime/spidernet/packets/intake.json
+   - tsconfig.tsbuildinfo
+   Mother Bridge policy: do not edit, stage, stash, revert, or bundle these with any Bridge packet. Flag in every handoff refresh until the owning lane resolves.
+
+4. Untracked paths awaiting lane attribution — likely part of the same other-lane WIP as OL-3; Mother Bridge has not claimed them:
+   - SAARTHI-PROTOCOL.md
+   - SETU-START-HERE.md
+   - artifacts/freeze/2026-04-19_00-41-12/
+   - artifacts/freeze/reports/
+   - artifacts/runtime/spidernet/ingest/
+   - blp/SETU-AZ-WORKFLOW.md
+   - lib/blp/
+   - docs/architecture/AI-PREFLIGHT-USAGE.md
+   - docs/architecture/CLAUDE-WORKFLOW.md
+   - docs/architecture/SETU-BRIDGE-ARCHITECTURE-SNAPSHOT.md
+   - docs/bridge-events.md
+   - docs/prompts/
+   - docs/rules/
+   - package-lock.json.bak.prefix-1776629540
+   - package.json.bak.prefix-1776629540
+   - rul/SETU-PASS-GATE.md
+   - scripts/open_setu_input_mode.sh
+   - scripts/setu_full_flow.sh
+   - scripts/setu_pass_gate_check.sh
+   - src/lib/events.ts
+   Mother Bridge policy: do not touch until the owning lane claims them. (`src/app/api/health/route.ts` is tracked separately under the residual-untracked section below and is not duplicated here.)
+
 ## Preserved lanes — deferred, scope-approval pending
 Each lane is a git stash. Do NOT mix lanes in a single packet. Resume one at a time, only after explicit scope approval.
 
