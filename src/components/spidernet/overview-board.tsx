@@ -16,6 +16,33 @@ const starterSteps = [
   "Execute through Dash 004, verify in Dash 005, and preserve history in Dash 006.",
 ];
 
+const moduleMap = [
+  {
+    name: "Setu Mother Bridge",
+    label: "brain + spine",
+    description:
+      "Parent shell that owns architecture, naming, module wiring, dashboard blueprint, ownership boundaries, and overall routing.",
+  },
+  {
+    name: "Drishti Operations",
+    label: "child operator console",
+    description:
+      "Child module for operator-facing work. It executes inside its own lane and does not transfer ownership back to the parent shell.",
+  },
+  {
+    name: "Extraction Terminal",
+    label: "child extraction/refiner surface",
+    description:
+      "Child module for extraction, refining, manifests, and memory or ledger preparation. It stays support-scoped inside its own lane.",
+  },
+];
+
+const ownershipRules = [
+  "Setu Mother Bridge routes automatically and child modules execute within their own lanes.",
+  "The six boards remain internal implementation surfaces for now; they are not the parent-child module map.",
+  "A wire enables coordination and health visibility, not ownership transfer or cross-lane editing rights.",
+];
+
 export function OverviewBoard({ boards, snapshot }: OverviewBoardProps) {
   const mainBoards = getVisibleBoards("main");
 
@@ -25,16 +52,16 @@ export function OverviewBoard({ boards, snapshot }: OverviewBoardProps) {
         <div className="rounded-[30px] border border-white/90 bg-white/88 p-5 shadow-[0_16px_60px_rgba(15,23,42,0.08)]">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Main Product Direction</p>
+              <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Parent Shell Direction</p>
               <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
-                White web SETU is the product. DRISHTI desktop is architecture reference only.
+                Setu Mother Bridge is the parent shell. Child modules attach without collapsing lane ownership.
               </h2>
               <p className="mt-3 max-w-4xl text-sm leading-7 text-slate-600">
-                This dashboard carries over the operating model, packet flow, registries, and readiness law from the desktop line without importing the dark Tk visual family.
+                This packet keeps the six internal boards in place while making the parent-level architecture explicit: Setu Mother Bridge owns routing and governance, while Drishti Operations and Extraction Terminal execute within their own lanes.
               </p>
             </div>
             <div className="rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
-              {boards.length} locked board definitions
+              {boards.length} internal board definitions
             </div>
           </div>
 
@@ -48,16 +75,52 @@ export function OverviewBoard({ boards, snapshot }: OverviewBoardProps) {
           </div>
         </div>
 
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
+          <div className="rounded-[30px] border border-white/90 bg-white/88 p-5 shadow-[0_16px_60px_rgba(15,23,42,0.08)]">
+            <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Parent-Owned Module Map</p>
+            <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">
+              One parent, attached child modules
+            </h2>
+            <div className="mt-5 grid gap-3">
+              {moduleMap.map((module) => (
+                <div key={module.name} className="rounded-[24px] border border-slate-200 bg-slate-50 p-4">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <p className="text-lg font-semibold text-slate-950">{module.name}</p>
+                    <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs text-slate-500">
+                      {module.label}
+                    </span>
+                  </div>
+                  <p className="mt-3 text-sm leading-6 text-slate-600">{module.description}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-[30px] border border-white/90 bg-white/88 p-5 shadow-[0_16px_60px_rgba(15,23,42,0.08)]">
+            <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Ownership Boundaries</p>
+            <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">
+              Parent routes, children execute
+            </h2>
+            <div className="mt-5 space-y-3">
+              {ownershipRules.map((rule) => (
+                <div key={rule} className="rounded-[24px] border border-slate-200 bg-slate-50 p-4 text-sm leading-6 text-slate-700">
+                  {rule}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
         <div className="rounded-[30px] border border-white/90 bg-white/88 p-5 shadow-[0_16px_60px_rgba(15,23,42,0.08)]">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Locked Six-Board Purpose Model</p>
+              <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Internal Six-Board Surface Model</p>
               <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">
-                One family, six fixed jobs
+                Six preserved implementation surfaces
               </h2>
             </div>
             <div className="rounded-full bg-cyan-50 px-3 py-1.5 text-sm font-medium text-cyan-700">
-              novice-first shell
+              preserved for now
             </div>
           </div>
 

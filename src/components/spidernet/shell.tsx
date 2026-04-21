@@ -21,6 +21,24 @@ const controlValues = {
   mode: "White web dashboard",
 };
 
+const attachedModules = [
+  {
+    name: "Setu Mother Bridge",
+    label: "brain + spine",
+    detail: "Parent shell for architecture, naming, module wiring, ownership boundaries, and automatic routing.",
+  },
+  {
+    name: "Drishti Operations",
+    label: "child operator console",
+    detail: "Child module executes operator-facing work inside its own lane.",
+  },
+  {
+    name: "Extraction Terminal",
+    label: "child extraction/refiner surface",
+    detail: "Child module handles extraction, refining, manifests, and support preparation inside its own lane.",
+  },
+];
+
 export function DashboardShell({
   activePath,
   eyebrow,
@@ -95,15 +113,15 @@ export function DashboardShell({
                     </div>
                   </div>
 
-                  <div className="flex flex-wrap gap-2">
-                    <span className="rounded-full border border-cyan-200 bg-cyan-50 px-3 py-1.5 text-sm font-medium text-cyan-700">
-                      White UI is primary
-                    </span>
-                    <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-sm text-slate-600">
-                      Tk visuals excluded
-                    </span>
-                  </div>
+                <div className="flex flex-wrap gap-2">
+                  <span className="rounded-full border border-cyan-200 bg-cyan-50 px-3 py-1.5 text-sm font-medium text-cyan-700">
+                      Setu Mother Bridge
+                  </span>
+                  <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-sm text-slate-600">
+                      six internal surfaces preserved
+                  </span>
                 </div>
+              </div>
 
                 <div className="grid gap-3 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
                   <div className="rounded-[26px] border border-slate-200 bg-slate-50 p-3">
@@ -123,8 +141,8 @@ export function DashboardShell({
                     </div>
                     <div className="mt-3 flex flex-wrap gap-2 text-xs text-slate-500">
                       <span className="rounded-full bg-white px-2.5 py-1">policy first</span>
-                      <span className="rounded-full bg-white px-2.5 py-1">six boards locked</span>
-                      <span className="rounded-full bg-white px-2.5 py-1">novice-first shell</span>
+                      <span className="rounded-full bg-white px-2.5 py-1">six boards preserved</span>
+                      <span className="rounded-full bg-white px-2.5 py-1">parent shell</span>
                     </div>
                   </div>
 
@@ -160,6 +178,24 @@ export function DashboardShell({
                     </Link>
                   ))}
                 </div>
+
+                <div className="rounded-[26px] border border-slate-200 bg-slate-50 p-4">
+                  <p className="text-xs uppercase tracking-[0.22em] text-slate-500">Parent Module Map</p>
+                  <p className="mt-2 text-sm leading-6 text-slate-600">
+                    Setu routes automatically and child modules execute within their own lanes.
+                  </p>
+                  <div className="mt-4 grid gap-3 md:grid-cols-3">
+                    {attachedModules.map((module) => (
+                      <div key={module.name} className="rounded-[22px] border border-slate-200 bg-white p-4">
+                        <p className="text-sm font-semibold text-slate-950">{module.name}</p>
+                        <p className="mt-1 text-xs uppercase tracking-[0.18em] text-slate-500">
+                          {module.label}
+                        </p>
+                        <p className="mt-3 text-sm leading-6 text-slate-600">{module.detail}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
 
               <aside className="rounded-[28px] border border-slate-200 bg-slate-50 p-4">
@@ -167,11 +203,11 @@ export function DashboardShell({
                   <div>
                     <p className="text-xs uppercase tracking-[0.22em] text-slate-500">Control Cluster</p>
                     <p className="mt-1 text-sm text-slate-600">
-                      Clear defaults for the current white web workflow.
+                      Parent-shell defaults for routing and coordination.
                     </p>
                   </div>
                   <div className="rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-500">
-                    novice-first
+                    lane-aware
                   </div>
                 </div>
 

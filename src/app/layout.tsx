@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "SpiderNet Control Deck",
+  title: "Setu Mother Bridge",
   description:
-    "Internal operations console for SpiderNet system visibility, tool routing, and disciplined multi-agent execution.",
+    "Parent shell for architecture, naming, module wiring, ownership boundaries, and child-module routing.",
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",

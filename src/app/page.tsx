@@ -9,9 +9,9 @@ export default async function Home() {
   return (
     <DashboardShell
       activePath="/"
-      eyebrow="SpiderNet Control Deck"
-      title="White web SETU operating surface"
-      description="The current white dashboard remains the main product direction. It now carries the DRISHTI Phase 5 operating model: six locked boards, four lanes, typed packets, policy-before-routing, vault routing, registry-driven execution, durable local storage, and explicit live-versus-prepared tool exposure."
+      eyebrow="Setu Mother Bridge"
+      title="Setu Mother Bridge parent shell"
+      description="Setu Mother Bridge is the parent shell for architecture, naming, module wiring, ownership boundaries, dashboard blueprint, and overall routing. The six boards remain the current internal implementation surfaces while child modules stay attached through their own lanes."
       quickStats={getBoardQuickStats(snapshot)}
     >
       <OverviewBoard boards={boardRegistry} snapshot={snapshot} />
