@@ -1,5 +1,19 @@
 # FTD — Future To Do
 
+## 2026-04-22 — P-DOCTRINE-PROPAGATION-02c parent follow-up packet
+- Canonical home for this doctrine follow-up is `plans/ftd.md` because it is the live future-task packet for deferred parent-altitude work and keeps this step doc-only.
+- Scope is Lane 1 only: Setu Mother Bridge follow-up doctrine, naming, and contract clarification. This packet does not change product code, `src/**`, child-module files, or `.handoff/*`.
+- Guardrail: do not absorb OL-3 / OL-4 into this packet. If later execution needs child-lane changes, record them under the owning lane and land them separately.
+- Peer-model reconciliation remains pending at the parent contract level: clarify how peer executors are compared, when they are advisory vs selectable, and how reconciliation results are surfaced without collapsing lane ownership.
+- Novice input terminal follow-up remains pending: define the parent-side contract for novice guidance, summary/explanation support, and safe escalation from intake wording to module routing without redesigning the child UI here.
+- Result surface contract remains pending: define the minimum truthful result states, error explanation fields, and completion surface expected after execution, especially when action, hold, or fallback paths diverge.
+- Automatic module selection under `ALL` remains pending: define deterministic parent routing rules for multi-module requests, including when `ALL` fans out, when it resolves to one module, and how the selection rationale is shown.
+- Self-heal visibility remains pending: define what recovery or corrective behavior can be shown at parent altitude without pretending that a child lane has already healed.
+- Browser / desktop / operator flow upgrades remain pending: align the future routing story across browser surfaces, desktop launch paths, and operator-facing flows so the parent contract stays coherent before implementation.
+- Claude / Codex file saving discipline remains pending: document the required save/freeze expectations for agent-assisted edits so generated work does not appear complete before files are actually written and preserved.
+- Lane-label reconciliation remains pending: normalize how Setu Mother Bridge, Drishti Operations, Extraction Terminal, HUD, operator, and app labels are referenced so parent doctrine and future UI copy do not drift.
+- Freeze rule for this packet: keep it as doctrine-only capture of pending parent work; no capability cuts, no lane crossing, and no implied implementation approval.
+
 ## 2026-04-16 — Ollama runtime truth path restored
 - White SETU now has the documented `artifacts/runtime/spidernet/config/ollama.json` scaffold in place, with legacy fallback preserved for older repo states.
 - `npm run lint`, `npx tsc --noEmit`, and `npm run build` passed for the contract fix.
