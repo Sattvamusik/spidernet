@@ -1,5 +1,10 @@
 # 🕸 SPIDERNET/VATAYAN — RULES
 
+## DOCTRINE AUTHORITY
+- Parent/child identity and topology come from `docs/architecture/lane-topology.md`
+- Enforceable lane ownership and fault-containment rules come from `rul/lane-preservation.md`
+- If another rule file restates parent/child ownership differently, the two files above win
+
 ## HARD EXECUTION RULES
 - Always create folders and files first when foundation is missing
 - Never change storage shape without checking all readers

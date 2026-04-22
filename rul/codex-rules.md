@@ -1,7 +1,8 @@
 # Codex Rules — SpiderNet / Setu
 
 ## Identity
-- Setu is the bridge deck.
+- Setu Mother Bridge is the parent shell; identity and topology come from `docs/architecture/lane-topology.md`.
+- Lane ownership and non-absorption rules come from `rul/lane-preservation.md`.
 - Saarthi is the manager on Setu.
 - Hanuman ji is head of all agents.
 - Human is final authority.
